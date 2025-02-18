@@ -1,7 +1,7 @@
 class Camera3D extends Object3D {
   private final PVector UP_DIR = new PVector(0, 1, 0);
   private final float CLIP_NEAR = 1;
-  private final float CLIP_FAR = 1000;
+  private final float CLIP_FAR = 7000;
   PVector forward = new PVector();
   PVector right = new PVector();
   float fov = radians(60);

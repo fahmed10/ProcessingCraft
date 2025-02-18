@@ -8,19 +8,20 @@ class Game {
   Map<IVector2, Chunk> chunks = new HashMap<>();
   PShader shader;
   PImage blockAtlas;
-  float drawRadius = 3;
+  float drawRadius = 8;
 
   void start() {
+    frameRate(1000);
     shader = loadShader("block.frag", "block.vert");
     camera.position.set(0, 80, 0);
-    ((PGraphicsOpenGL)g).textureSampling(2);
+    pgl.textureSampling(2);
     blockAtlas = loadImage("img/block_atlas.png");
     PGraphicsOpenGL.maxAnisoAmount = 1; // Fix black lines appearing between blocks
 
     shader(shader);
     shader.set("tex", blockAtlas);
-    shader.set("fogFar", drawRadius * 180);
-    shader.set("fogNear", drawRadius * 160);
+    shader.set("fogFar", drawRadius * Chunk.CHUNK_SIZE - 220);
+    shader.set("fogNear", drawRadius * Chunk.CHUNK_SIZE - 265);
   }
 
   void update(float delta) {
@@ -46,7 +47,7 @@ class Game {
     if (Input.isKeyDown(RIGHT)) camera.rotation.add(0, speed, 0);
 
     PVector mouse = Input.getMouseMovement();
-    camera.rotation.add(mouse.y * 0.2, mouse.x * 0.2);
+    camera.rotation.add(mouse.y * (0.025 + delta * 25), mouse.x * (0.025 + delta * 25));
     camera.rotation.x = constrain(camera.rotation.x, -80, 80);
 
     camera.use();
@@ -65,18 +66,18 @@ class Game {
     for (int x = -drawChunks; x <= drawChunks; x++) {
       for (int y = -drawChunks; y <= drawChunks; y++) {
         IVector2 chunkPos = new IVector2(chunkX + x, chunkY + y);
-        CoordSpace.getChunkWorldPosition(chunkPos, vector);
-        
-        if (chunks.containsKey(chunkPos)) {
-          getChunk(chunkPos).getWorldCorners(chunkMin, chunkMax);
-        } else {
-          CoordSpace.getChunkWorldCorners(chunkPos, chunkMin, chunkMax);
-        }
+        CoordSpace.getChunkWorldCenter(chunkPos, vector);
+        Chunk chunk = getChunk(chunkPos);
+        chunk.getWorldCorners(chunkMin, chunkMax);
 
-        boolean inRadius = Utils.distLesser(camera.position, vector, drawRadius * Chunk.CHUNK_SIZE);
-        boolean inFrustum = camera.frustum.containsBox(chunkMin, chunkMax);
+        PVector cameraXZ = camera.position.copy();
+        cameraXZ.y = 0;
+        boolean inRadius = Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
+        inRadius |= Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
+        boolean inFrustum = true || camera.frustum.containsBox(chunkMin, chunkMax);
+        vector.y = 0;
 
-        if (inRadius && (inFrustum || Utils.distLesser(camera.position, vector, 1 * Chunk.CHUNK_SIZE))) {
+        if (inRadius && (inFrustum || Utils.distLesser(cameraXZ, vector, 2 * Chunk.CHUNK_SIZE))) {
           getChunk(chunkPos).draw(shader);
         }
       }
@@ -99,7 +100,7 @@ class Game {
     for (int x = 0; x < Chunk.CHUNK_BLOCKS; x++) {
       for (int z = 0; z < Chunk.CHUNK_BLOCKS; z++) {
         float noiseValue = noise((position.x * Chunk.CHUNK_BLOCKS + x) * 0.1, (position.y * Chunk.CHUNK_BLOCKS + z) * 0.1);
-        int y = round(noiseValue * 5);
+        int y = round(noiseValue * 6);
         IVector3 blockPos = new IVector3(x, y, z);
         chunk.blocks.put(blockPos, new Block(chunk, blockPos));
       }
