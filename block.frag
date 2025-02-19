@@ -12,6 +12,7 @@ uniform sampler2D tex;
 uniform float fogFar;
 uniform float fogNear;
 uniform vec3 fogColor;
+uniform vec3 sunDirection;
 const float atlasSize = 512.0;
 const float atlasItemSize = 16.0;
 const float atlasItemUvSize = atlasItemSize / atlasSize;
@@ -28,12 +29,8 @@ vec2 faceUv(vec2 uv, int face) {
 }
 
 vec3 light(vec3 color) {
-    if (vertNormal.y > 0.99) return mix(color, vec3(1), 0.1);
-    if (vertNormal.y < 0.99) return mix(color, vec3(0), 0.1);
-    if (vertNormal.x > 0.99) return mix(color, vec3(1), 0.1);
-    if (vertNormal.x < 0.99) return mix(color, vec3(1), 0.0);
-    if (vertNormal.z > 0.99) return mix(color, vec3(1), 0.1);
-    if (vertNormal.z < 0.99) return mix(color, vec3(1), 0.0);
+    float dp = dot(vertNormal, sunDirection);
+    return mix(color, vec3(0), ((dp + 1.0) / 2.0) * 0.75);
 }
 
 void main() {

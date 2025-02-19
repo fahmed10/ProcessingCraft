@@ -9,7 +9,7 @@ PGraphicsOpenGL pgl;
 
 void setup() {
   size(800, 600, P3D);
-  background(255);
+  background(0);
   outer = this;
   Input.init(surface, width, height);
   gl = (GL4)((GLWindow)surface.getNative()).getGL();
@@ -20,7 +20,6 @@ void setup() {
 }
 
 void draw() {
-  background(255);
   Input.tick(width, height, mouseX, mouseY);
   double delta = (double)((double)System.nanoTime() - _lastTime) * 1e-9;
   _lastTime = System.nanoTime();

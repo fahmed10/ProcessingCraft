@@ -12,6 +12,7 @@ class Game {
   float drawRadius = 2000;
   final float maxMouseDelta = 6000;
   PVector skyColor = new PVector(0, 0.8, 1);
+  PVector sunDirection = new PVector(1, -2, 0.75).normalize();
 
   void start() {
     frameRate(1000);
@@ -26,6 +27,7 @@ class Game {
     shader.set("fogFar", drawRadius - 200);
     shader.set("fogNear", (drawRadius - 200) * 0.93 - 15);
     shader.set("fogColor", skyColor);
+    shader.set("sunDirection", sunDirection);
     
     new SoundFile(outer, "audio/music.mp3").play(1, 0.5);
   }
