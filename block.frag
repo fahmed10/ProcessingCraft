@@ -11,6 +11,7 @@ varying vec2 uv;
 uniform sampler2D tex;
 uniform float fogFar;
 uniform float fogNear;
+uniform vec3 fogColor;
 const float atlasSize = 512.0;
 const float atlasItemSize = 16.0;
 const float atlasItemUvSize = atlasItemSize / atlasSize;
@@ -43,5 +44,5 @@ void main() {
 
     float z = gl_FragCoord.z / gl_FragCoord.w;
     float fogFactor = clamp((fogFar - z) / (fogFar - fogNear), 0.0, 1.0);
-    gl_FragColor = mix(vec4(1), vec4(color, 1), fogFactor);
+    gl_FragColor = vec4(mix(fogColor, color, fogFactor), 1);
 }

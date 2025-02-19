@@ -49,27 +49,15 @@ static class Utils {
     }
   }
   
-  static PVector calculateVector(Func3<Float, Float, Float> fn, PVector v1, PVector v2, PVector out) {
-    return out.set(fn.invoke(v1.x, v2.x), fn.invoke(v1.y, v2.y), fn.invoke(v1.z, v2.z));
+  static color toColor(PVector vector) {
+    return toColor(vector.x, vector.y, vector.z);
   }
   
-  static PVector calculateVector(Func4<Float, Float, Float, Float> fn, PVector v1, PVector v2, PVector v3, PVector out) {
-    return out.set(fn.invoke(v1.x, v2.x, v3.x), fn.invoke(v1.y, v2.y, v3.y), fn.invoke(v1.z, v2.z, v3.z));
+  static color toColor(int r, int g, int b) {
+    return (r << 16) | (g << 8) | b;
   }
   
-  static PVector calculateVector(Func4<Float, Float, Float, Float> fn, float f, PVector v2, PVector v3, PVector out) {
-    return out.set(fn.invoke(f, v2.x, v3.x), fn.invoke(f, v2.y, v3.y), fn.invoke(f, v2.z, v3.z));
-  }
-  
-  static PVector calculateVector(Func5<Float, Float, Float, Float, Float> fn, PVector v1, PVector v2, PVector v3, PVector v4, PVector out) {
-    return out.set(fn.invoke(v1.x, v2.x, v3.x, v4.x), fn.invoke(v1.y, v2.y, v3.y, v4.y), fn.invoke(v1.z, v2.z, v3.z, v4.z));
-  }
-  
-  static PVector calculateVector(Func6<Float, Float, Float, Float, Float, Float> fn, PVector v1, PVector v2, PVector v3, PVector v4, PVector v5, PVector out) {
-    return out.set(fn.invoke(v1.x, v2.x, v3.x, v4.x, v5.x), fn.invoke(v1.y, v2.y, v3.y, v4.y, v5.y), fn.invoke(v1.z, v2.z, v3.z, v4.z, v5.z));
-  }
-  
-  static PVector calculateVector(Func6<Float, Float, Float, Float, Float, Float> fn, float f1, float f2, PVector v3, PVector v4, PVector v5, PVector out) {
-    return out.set(fn.invoke(f1, f2, v3.x, v4.x, v5.x), fn.invoke(f1, f2, v3.y, v4.y, v5.y), fn.invoke(f1, f2, v3.z, v4.z, v5.z));
+  static color toColor(float r, float g, float b) {
+    return ((int)(r * 255) << 16) | ((int)(g * 255) << 8) | (int)(b * 255);
   }
 }

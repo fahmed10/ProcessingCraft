@@ -11,6 +11,7 @@ class Game {
   PImage blockAtlas;
   float drawRadius = 2000;
   final float maxMouseDelta = 6000;
+  PVector skyColor = new PVector(0, 0.8, 1);
 
   void start() {
     frameRate(1000);
@@ -24,11 +25,13 @@ class Game {
     shader.set("tex", blockAtlas);
     shader.set("fogFar", drawRadius - 200);
     shader.set("fogNear", (drawRadius - 200) * 0.93 - 15);
+    shader.set("fogColor", skyColor);
     
     new SoundFile(outer, "audio/music.mp3").play(1, 0.5);
   }
 
   void update(float delta) {
+    background(Utils.toColor(skyColor));
     noStroke();
     gl.glEnable(GL.GL_CULL_FACE);
     println(delta * 1e3 + "ms (" + (int)frameRate + " FPS)");
