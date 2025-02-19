@@ -31,7 +31,7 @@ static class Input {
       return;
     }
     
-    if (r.hasFocus()) {
+    if (r.hasFocus() && r.isVisible()) {
       mouseMovement.set(mouseX - (width / 2), mouseY - (height / 2));
       r.warpPointer(width / 2, height / 2);
     }

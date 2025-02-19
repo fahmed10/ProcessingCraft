@@ -1,6 +1,6 @@
 import java.util.Objects;
 
-class IVector2 {
+static class IVector2 {
   int x, y;
   
   IVector2() {}
@@ -9,9 +9,10 @@ class IVector2 {
     set(x, y);
   }
   
-  void set(int x, int y) {
+  IVector2 set(int x, int y) {
     this.x = x;
     this.y = y;
+    return this;
   }
   
   void add(IVector2 b) {
@@ -45,7 +46,7 @@ class IVector2 {
   }
 }
 
-class IVector3 {
+static class IVector3 {
   int x, y, z;
   
   IVector3() {}

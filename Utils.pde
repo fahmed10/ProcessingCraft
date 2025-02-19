@@ -14,6 +14,12 @@ static class Utils {
     println(Duration.between(start, end));
   }
   
+  static void addAll(Collection<Integer> collection, int[] array) {
+    for (int i : array) {
+      collection.add(i);
+    }
+  }
+  
   static PVector calculateVector(Func3<Float, Float, Float> fn, PVector v1, PVector v2, PVector out) {
     return out.set(fn.invoke(v1.x, v2.x), fn.invoke(v1.y, v2.y), fn.invoke(v1.z, v2.z));
   }

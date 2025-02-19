@@ -1,4 +1,4 @@
-class ViewFrustum {
+static class ViewFrustum {
   PVector nearBottomLeft = new PVector();
   PVector nearBottomRight = new PVector();
   PVector nearTopLeft = new PVector();

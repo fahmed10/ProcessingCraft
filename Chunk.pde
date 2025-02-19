@@ -1,4 +1,4 @@
-import java.util.List;
+import java.util.*;
 import com.jogamp.newt.opengl.*;
 import com.jogamp.opengl.*;
 
@@ -11,8 +11,7 @@ class Chunk {
   Map<IVector3, Block> blocks = new HashMap<>();
   int minY;
   int maxY;
-  Model3D cube;
-  Model3D model;
+  private Model3D model;
 
   Chunk(IVector2 position) {
     this.position = position;
@@ -27,7 +26,6 @@ class Chunk {
   }
 
   void generateMesh() {
-    cube = new Model3D(createShape(BOX, Block.BLOCK_SIZE));
     PShapeOpenGL mesh = PShapeOpenGL.createShape(pgl, createShape());
     mesh.beginShape(QUADS);
     IVector3 position = new IVector3();
@@ -41,69 +39,29 @@ class Chunk {
         if (bp.y < minY) minY = block.position.y;
         if (bp.y > maxY) maxY = block.position.y;
 
-        if (!blockAtOffset(bp, position.set(0, 1, 0))) drawPlaneTop(mesh, bp.x, bp.y, bp.z);
-        if (!blockAtOffset(bp, position.set(0, -1, 0))) drawPlaneBottom(mesh, bp.x, bp.y, bp.z);
-        if (!blockAtOffset(bp, position.set(0, 0, 1))) drawPlaneSideZ(mesh, bp.x, bp.y, bp.z);
-        if (!blockAtOffset(bp, position.set(0, 0, -1))) drawPlaneSideNZ(mesh, bp.x, bp.y, bp.z);
-        if (!blockAtOffset(bp, position.set(1, 0, 0))) drawPlaneSideX(mesh, bp.x, bp.y, bp.z);
-        if (!blockAtOffset(bp, position.set(-1, 0, 0))) drawPlaneSideNX(mesh, bp.x, bp.y, bp.z);
+        int blockId = block.type.getId();
+
+        if (!blockAtOffset(bp, position.set(0, 1, 0))) drawPlaneTop(mesh, bp.x, bp.y, bp.z, blockId);
+        if (!blockAtOffset(bp, position.set(0, -1, 0))) drawPlaneBottom(mesh, bp.x, bp.y, bp.z, blockId);
+        if (!blockAtOffset(bp, position.set(0, 0, 1))) drawPlaneSideZ(mesh, bp.x, bp.y, bp.z, blockId);
+        if (!blockAtOffset(bp, position.set(0, 0, -1))) drawPlaneSideNZ(mesh, bp.x, bp.y, bp.z, blockId);
+        if (!blockAtOffset(bp, position.set(1, 0, 0))) drawPlaneSideX(mesh, bp.x, bp.y, bp.z, blockId);
+        if (!blockAtOffset(bp, position.set(-1, 0, 0))) drawPlaneSideNX(mesh, bp.x, bp.y, bp.z, blockId);
       }
     }
 
     mesh.endShape();
     model = new Model3D(mesh);
   }
-  
+
   private boolean blockAtOffset(IVector3 bp, IVector3 offset) {
     IVector3 position = offset.add(bp);
-    
+
     if (position.x >= 0 && position.y >= 0 && position.z >= 0 && position.x < CHUNK_BLOCKS && position.y < CHUNK_BLOCKS && position.z < CHUNK_BLOCKS) {
       return blocks.containsKey(position);
     }
-    
+
     return false; // TODO: Check for blocks at chunk boundaries
-  }
-
-  private void drawPlaneTop(PShape mesh, int x, int y, int z) {
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 1);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0, 1);
-  }
-
-  private void drawPlaneBottom(PShape mesh, int x, int y, int z) {
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0, 1);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 1);
-  }
-
-  private void drawPlaneSideZ(PShape mesh, int x, int y, int z) {
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0, 1);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 1);
-  }
-
-  private void drawPlaneSideNZ(PShape mesh, int x, int y, int z) {
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1, 1);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 1);
-  }
-
-  private void drawPlaneSideX(PShape mesh, int x, int y, int z) {
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 1);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 1);
-  }
-
-  private void drawPlaneSideNX(PShape mesh, int x, int y, int z) {
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 1);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 0);
-    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1, 1);
   }
 
   void draw(PShader shader) {
@@ -111,8 +69,49 @@ class Chunk {
       return;
     }
 
-    shader.set("faces", new int[] {1, 2, 0, 0, 0, 0});
     model.position.set(position.x * CHUNK_SIZE, 0, position.y * CHUNK_SIZE);
     model.draw();
+  }
+
+  private void drawPlaneTop(PShape mesh, int x, int y, int z, int uvOffset) {
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 1 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), y * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0 + uvOffset, 1 + uvOffset);
+  }
+
+  private void drawPlaneBottom(PShape mesh, int x, int y, int z, int uvOffset) {
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0 + uvOffset, 1 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 1 + uvOffset);
+  }
+
+  private void drawPlaneSideZ(PShape mesh, int x, int y, int z, int uvOffset) {
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0 + uvOffset, 1 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 0 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 1 + uvOffset);
+  }
+
+  private void drawPlaneSideNZ(PShape mesh, int x, int y, int z, int uvOffset) {
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1 + uvOffset, 1 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 1 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 1 + uvOffset);
+  }
+
+  private void drawPlaneSideX(PShape mesh, int x, int y, int z, int uvOffset) {
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 1 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x + 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 1 + uvOffset);
+  }
+
+  private void drawPlaneSideNX(PShape mesh, int x, int y, int z, int uvOffset) {
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 1 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z - 0.5), 0 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y - 1) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 0 + uvOffset);
+    mesh.vertex(Block.BLOCK_SIZE * (x - 0.5), (y) * Block.BLOCK_SIZE, Block.BLOCK_SIZE * (z + 0.5), 1 + uvOffset, 1 + uvOffset);
   }
 }

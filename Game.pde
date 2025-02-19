@@ -1,4 +1,4 @@
-import java.util.Map;
+import java.util.*;
 import com.jogamp.newt.opengl.*;
 import com.jogamp.opengl.*;
 import java.time.*;
@@ -22,6 +22,12 @@ class Game {
     shader.set("tex", blockAtlas);
     shader.set("fogFar", drawRadius * Chunk.CHUNK_SIZE - 220);
     shader.set("fogNear", drawRadius * Chunk.CHUNK_SIZE - 265);
+    
+    List<Integer> faceIds = new ArrayList<>();
+    for (BlockType type : BlockType.values()) {
+      Utils.addAll(faceIds, type.getFaceIds());
+    }
+    shader.set("faces", faceIds.stream().mapToInt(i -> i).toArray());
   }
 
   void update(float delta) {
@@ -56,8 +62,7 @@ class Game {
   }
 
   void drawTerrain() {
-    int chunkX = floor(camera.position.x / Chunk.CHUNK_SIZE);
-    int chunkY = floor(camera.position.z / Chunk.CHUNK_SIZE);
+    IVector2 currentChunkPosition = CoordSpace.getWorldChunkPosition(camera.position);
     int drawChunks = ceil(drawRadius);
     PVector vector = new PVector();
     PVector chunkMin = new PVector();
@@ -65,7 +70,7 @@ class Game {
 
     for (int x = -drawChunks; x <= drawChunks; x++) {
       for (int y = -drawChunks; y <= drawChunks; y++) {
-        IVector2 chunkPos = new IVector2(chunkX + x, chunkY + y);
+        IVector2 chunkPos = new IVector2(currentChunkPosition.x + x, currentChunkPosition.y + y);
         CoordSpace.getChunkWorldCenter(chunkPos, vector);
         Chunk chunk = getChunk(chunkPos);
         chunk.getWorldCorners(chunkMin, chunkMax);
@@ -102,7 +107,7 @@ class Game {
         float noiseValue = noise((position.x * Chunk.CHUNK_BLOCKS + x) * 0.1, (position.y * Chunk.CHUNK_BLOCKS + z) * 0.1);
         int y = round(noiseValue * 6);
         IVector3 blockPos = new IVector3(x, y, z);
-        chunk.blocks.put(blockPos, new Block(chunk, blockPos));
+        chunk.blocks.put(blockPos, new Block(chunk, blockPos, BlockType.DIRT));
       }
     }
 

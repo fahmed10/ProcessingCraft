@@ -26,4 +26,8 @@ static class CoordSpace {
     getChunkWorldPosition(chunkPosition, out);
     return out.add(position.x * Block.BLOCK_SIZE, position.y * Block.BLOCK_SIZE, position.z * Block.BLOCK_SIZE);
   }
+  
+  static IVector2 getWorldChunkPosition(PVector position) {
+    return new IVector2(floor(position.x / Chunk.CHUNK_SIZE), floor(position.z / Chunk.CHUNK_SIZE));
+  }
 }
