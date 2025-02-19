@@ -5,10 +5,11 @@ import java.time.*;
 
 class Game {
   Camera3D camera = new Camera3D();
-  Map<IVector2, Chunk> chunks = new HashMap<>();
+  World world = new World();
   PShader shader;
   PImage blockAtlas;
-  float drawRadius = 8;
+  float drawRadius = 12;
+  final float maxMouseDelta = 6000;
 
   void start() {
     frameRate(1000);
@@ -22,20 +23,14 @@ class Game {
     shader.set("tex", blockAtlas);
     shader.set("fogFar", drawRadius * Chunk.CHUNK_SIZE - 220);
     shader.set("fogNear", drawRadius * Chunk.CHUNK_SIZE - 265);
-    
-    List<Integer> faceIds = new ArrayList<>();
-    for (BlockType type : BlockType.values()) {
-      Utils.addAll(faceIds, type.getFaceIds());
-    }
-    shader.set("faces", faceIds.stream().mapToInt(i -> i).toArray());
   }
 
   void update(float delta) {
     noStroke();
     gl.glEnable(GL.GL_CULL_FACE);
-    println(delta + " (" + frameRate + ")");
+    println(delta * 1e3 + "ms (" + (int)frameRate + " FPS)");
 
-    float speed = 100 * delta;
+    float speed = 200 * delta;
 
     if (Input.isKeyDown(Key.SHIFT)) speed *= 2;
 
@@ -53,7 +48,8 @@ class Game {
     if (Input.isKeyDown(RIGHT)) camera.rotation.add(0, speed, 0);
 
     PVector mouse = Input.getMouseMovement();
-    camera.rotation.add(mouse.y * (0.025 + delta * 25), mouse.x * (0.025 + delta * 25));
+    float mouseDelta = (0.04 + delta * 7) * 1.5;
+    camera.rotation.add(constrain(mouse.y * mouseDelta, -maxMouseDelta, maxMouseDelta), constrain(mouse.x * mouseDelta, -maxMouseDelta, maxMouseDelta));
     camera.rotation.x = constrain(camera.rotation.x, -80, 80);
 
     camera.use();
@@ -67,50 +63,37 @@ class Game {
     PVector vector = new PVector();
     PVector chunkMin = new PVector();
     PVector chunkMax = new PVector();
+    int chunksGenerated = 0;
 
     for (int x = -drawChunks; x <= drawChunks; x++) {
       for (int y = -drawChunks; y <= drawChunks; y++) {
         IVector2 chunkPos = new IVector2(currentChunkPosition.x + x, currentChunkPosition.y + y);
         CoordSpace.getChunkWorldCenter(chunkPos, vector);
-        Chunk chunk = getChunk(chunkPos);
-        chunk.getWorldCorners(chunkMin, chunkMax);
-
         PVector cameraXZ = camera.position.copy();
         cameraXZ.y = 0;
         vector.y = 0;
         boolean inRadius = Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
+
+        if (!inRadius) {
+          continue;
+        }
+
+        if (!world.chunks.containsKey(chunkPos) || !world.chunks.get(chunkPos).hasMesh()) {
+          if (chunksGenerated >= 2) {
+            continue;
+          } else {
+            chunksGenerated++;
+          }
+        }
+
+        Chunk chunk = world.getChunk(chunkPos, true);
+        chunk.getWorldCorners(chunkMin, chunkMax);
         boolean inFrustum = true; // camera.frustum.containsBox(chunkMin, chunkMax);
 
-        if (inRadius && inFrustum) {
-          getChunk(chunkPos).draw();
+        if (inFrustum) {
+          chunk.draw();
         }
       }
     }
-  }
-
-  Chunk getChunk(IVector2 position) {
-    if (chunks.containsKey(position)) {
-      return chunks.get(position);
-    }
-
-    Chunk chunk = generateChunk(position);
-    chunks.put(position, chunk);
-    return chunk;
-  }
-
-  Chunk generateChunk(IVector2 position) {
-    Chunk chunk = new Chunk(position);
-
-    for (int x = 0; x < Chunk.CHUNK_BLOCKS; x++) {
-      for (int z = 0; z < Chunk.CHUNK_BLOCKS; z++) {
-        float noiseValue = noise((position.x * Chunk.CHUNK_BLOCKS + x) * 0.1, (position.y * Chunk.CHUNK_BLOCKS + z) * 0.1);
-        int y = round(noiseValue * 6);
-        IVector3 blockPos = new IVector3(x, y, z);
-        chunk.blocks.put(blockPos, new Block(chunk, blockPos, random(1) > 0.6 ? BlockType.SAND : BlockType.GRASS));
-      }
-    }
-
-    chunk.generateMesh();
-    return chunk;
   }
 }

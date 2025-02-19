@@ -1,4 +1,6 @@
 static class Utils {
+  private static Map<String, List<Double>> profileTimes = new HashMap<>();
+  
   static boolean distGreater(PVector a, PVector b, float dist) {
     return sq(b.x - a.x) + sq(b.y - a.y) > sq(dist);
   }
@@ -7,11 +9,38 @@ static class Utils {
     return !distGreater(a, b, dist);
   }
   
-  static void profile(Action0 fn) {
-    Instant start = Instant.now();
+  static void profile(String name, Action0 fn) {
+    long start = System.nanoTime();
     fn.invoke();
-    Instant end = Instant.now();
-    println(Duration.between(start, end));
+    double time = (double)(System.nanoTime() - start) * 1e-6;
+    profileTimes.computeIfAbsent(name, n -> new ArrayList<>()).add(time);
+    println(name + ": " + String.format("%.2f", time) + "ms <Avg: " + String.format("%.2f", profileTimes.get(name).stream().mapToDouble(d -> d).average().orElseThrow()) + "ms>");
+  }
+  
+  static <T> T profile(String name, Func1<T> fn) {
+    long start = System.nanoTime();
+    T value = fn.invoke();
+    double time = (double)(System.nanoTime() - start) * 1e-6;
+    profileTimes.computeIfAbsent(name, n -> new ArrayList<>()).add(time);
+    println(name + ": " + String.format("%.2f", time) + "ms <Avg: " + String.format("%.2f", profileTimes.get(name).stream().mapToDouble(d -> d).average().orElseThrow()) + "ms>");
+    return value;
+  }
+  
+  static void profileMicro(String name, Action0 fn) {
+    long start = System.nanoTime();
+    fn.invoke();
+    double time = (double)(System.nanoTime() - start) * 1e-3;
+    profileTimes.computeIfAbsent(name, n -> new ArrayList<>()).add(time);
+    println(name + ": " + String.format("%.3f", time) + "us <Avg: " + String.format("%.3f", profileTimes.get(name).stream().mapToDouble(d -> d).average().orElseThrow()) + "us>");
+  }
+  
+  static <T> T profileMicro(String name, Func1<T> fn) {
+    long start = System.nanoTime();
+    T value = fn.invoke();
+    double time = (double)(System.nanoTime() - start) * 1e-3;
+    profileTimes.computeIfAbsent(name, n -> new ArrayList<>()).add(time);
+    println(name + ": " + String.format("%.3f", time) + "us <Avg: " + String.format("%.3f", profileTimes.get(name).stream().mapToDouble(d -> d).average().orElseThrow()) + "us>");
+    return value;
   }
   
   static void addAll(Collection<Integer> collection, int[] array) {
