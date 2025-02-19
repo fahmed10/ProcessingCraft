@@ -77,13 +77,12 @@ class Game {
 
         PVector cameraXZ = camera.position.copy();
         cameraXZ.y = 0;
-        boolean inRadius = Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
-        inRadius |= Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
-        boolean inFrustum = true || camera.frustum.containsBox(chunkMin, chunkMax);
         vector.y = 0;
+        boolean inRadius = Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
+        boolean inFrustum = true; // camera.frustum.containsBox(chunkMin, chunkMax);
 
-        if (inRadius && (inFrustum || Utils.distLesser(cameraXZ, vector, 2 * Chunk.CHUNK_SIZE))) {
-          getChunk(chunkPos).draw(shader);
+        if (inRadius && inFrustum) {
+          getChunk(chunkPos).draw();
         }
       }
     }
@@ -107,7 +106,7 @@ class Game {
         float noiseValue = noise((position.x * Chunk.CHUNK_BLOCKS + x) * 0.1, (position.y * Chunk.CHUNK_BLOCKS + z) * 0.1);
         int y = round(noiseValue * 6);
         IVector3 blockPos = new IVector3(x, y, z);
-        chunk.blocks.put(blockPos, new Block(chunk, blockPos, BlockType.DIRT));
+        chunk.blocks.put(blockPos, new Block(chunk, blockPos, random(1) > 0.6 ? BlockType.SAND : BlockType.GRASS));
       }
     }
 

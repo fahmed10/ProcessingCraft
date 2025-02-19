@@ -29,7 +29,7 @@ enum BlockType {
   int getId() {
     return ordinal();
   }
-  
+
   int[] getFaceIds() {
     return faceIds;
   }

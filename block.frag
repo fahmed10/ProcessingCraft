@@ -30,7 +30,8 @@ vec2 faceUv(vec2 uv, int face, int offset) {
 
 void main() {
     vec2 ruv;
-    int blockId = int(floor(uv.x + uv.y) / 2.0);
+    float totalUV = uv.x + uv.y;
+    int blockId = int(vertColor.r * 256.0);
     int faceOffset = blockId * BLOCK_FACES;
 
     if (vertNormal.y > 0.99) ruv = faceUv(uv, faces[0 + faceOffset], blockId);
