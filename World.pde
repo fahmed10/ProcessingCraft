@@ -19,13 +19,17 @@ class World {
     chunks.put(position, chunk);
     return chunk;
   }
+  
+  private float perlinNoise2d(float x, float y, float scale) {
+    return noise(x * scale + 92834, y * scale - 52976);
+  }
 
   Chunk generateChunk(IVector2 position) {
     Chunk chunk = new Chunk(this, position);
 
     for (int x = 0; x < Chunk.CHUNK_BLOCKS; x++) {
       for (int z = 0; z < Chunk.CHUNK_BLOCKS; z++) {
-        float noiseValue = noise((position.x * Chunk.CHUNK_BLOCKS + x) * 0.1, (position.y * Chunk.CHUNK_BLOCKS + z) * 0.1);
+        float noiseValue = perlinNoise2d(position.x * Chunk.CHUNK_BLOCKS + x, position.y * Chunk.CHUNK_BLOCKS + z, 0.075);
         int y = round(noiseValue * 6);
 
         var local = new Object() {
@@ -35,7 +39,7 @@ class World {
           }
         };
 
-        local.addBlock(x, y, z, y <= 1 ? BlockType.SAND : BlockType.GRASS);
+        local.addBlock(x, y, z, y <= 2 ? BlockType.SAND : BlockType.GRASS);
         for (int i = 1; y - i >= -5; i++) {
           local.addBlock(x, y - i, z, BlockType.DIRT);
         }

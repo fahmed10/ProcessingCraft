@@ -2,13 +2,14 @@ import java.util.*;
 import com.jogamp.newt.opengl.*;
 import com.jogamp.opengl.*;
 import java.time.*;
+import processing.sound.*;
 
 class Game {
   Camera3D camera = new Camera3D();
   World world = new World();
   PShader shader;
   PImage blockAtlas;
-  float drawRadius = 12;
+  float drawRadius = 2000;
   final float maxMouseDelta = 6000;
 
   void start() {
@@ -16,13 +17,15 @@ class Game {
     shader = loadShader("block.frag", "block.vert");
     camera.position.set(0, 80, 0);
     pgl.textureSampling(2);
-    blockAtlas = loadImage("img/block_atlas.png");
+    blockAtlas = loadImage(dataPath("img/block_atlas.png"));
     PGraphicsOpenGL.maxAnisoAmount = 1; // Fix black lines appearing between blocks
 
     shader(shader);
     shader.set("tex", blockAtlas);
-    shader.set("fogFar", drawRadius * Chunk.CHUNK_SIZE - 220);
-    shader.set("fogNear", drawRadius * Chunk.CHUNK_SIZE - 265);
+    shader.set("fogFar", drawRadius - 200);
+    shader.set("fogNear", (drawRadius - 200) * 0.93 - 15);
+    
+    new SoundFile(outer, "audio/music.mp3").play(1, 0.5);
   }
 
   void update(float delta) {
@@ -59,7 +62,7 @@ class Game {
 
   void drawTerrain() {
     IVector2 currentChunkPosition = CoordSpace.getWorldChunkPosition(camera.position);
-    int drawChunks = ceil(drawRadius);
+    int drawChunks = ceil(drawRadius / Chunk.CHUNK_SIZE);
     PVector vector = new PVector();
     PVector chunkMin = new PVector();
     PVector chunkMax = new PVector();
@@ -72,14 +75,17 @@ class Game {
         PVector cameraXZ = camera.position.copy();
         cameraXZ.y = 0;
         vector.y = 0;
-        boolean inRadius = Utils.distLesser(cameraXZ, vector, drawRadius * Chunk.CHUNK_SIZE);
+        boolean inRadius = Utils.distLesser(cameraXZ, vector, drawRadius);
+        
+        CoordSpace.getChunkWorldCorners(chunkPos, chunkMin, chunkMax);
+        boolean inFrustum = true; //camera.frustum.containsBox(chunkMin, chunkMax) || camera.frustum.containsBox(new PVector(chunkMax.x, 0, chunkMin.z), new PVector(chunkMin.x, 0, chunkMax.z));
 
-        if (!inRadius) {
+        if (!inRadius || !inFrustum) {
           continue;
         }
 
         if (!world.chunks.containsKey(chunkPos) || !world.chunks.get(chunkPos).hasMesh()) {
-          if (chunksGenerated >= 2) {
+          if (chunksGenerated >= 4) {
             continue;
           } else {
             chunksGenerated++;
@@ -87,12 +93,7 @@ class Game {
         }
 
         Chunk chunk = world.getChunk(chunkPos, true);
-        chunk.getWorldCorners(chunkMin, chunkMax);
-        boolean inFrustum = true; // camera.frustum.containsBox(chunkMin, chunkMax);
-
-        if (inFrustum) {
-          chunk.draw();
-        }
+        chunk.draw();
       }
     }
   }
