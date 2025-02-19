@@ -24,10 +24,20 @@ vec2 faceUv(vec2 uv, int face) {
     return ruv;
 }
 
+vec3 light(vec3 color) {
+    if (vertNormal.y > 0.99) return mix(color, vec3(1), 0.1);
+    if (vertNormal.y < 0.99) return mix(color, vec3(0), 0.1);
+    if (vertNormal.x > 0.99) return mix(color, vec3(1), 0.1);
+    if (vertNormal.x < 0.99) return mix(color, vec3(1), 0.0);
+    if (vertNormal.z > 0.99) return mix(color, vec3(1), 0.1);
+    if (vertNormal.z < 0.99) return mix(color, vec3(1), 0.0);
+}
+
 void main() {
     int face = int(vertColor.r * 256.0 * 256.0) + int(vertColor.g * 256.0);
     vec2 ruv = faceUv(uv, face);
     vec3 color = texture2D(tex, ruv).rgb;
+    color = light(color);
 
     float z = gl_FragCoord.z / gl_FragCoord.w;
     float fogFactor = clamp((fogFar - z) / (fogFar - fogNear), 0.0, 1.0);
