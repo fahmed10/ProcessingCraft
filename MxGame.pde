@@ -3,7 +3,7 @@ import com.jogamp.opengl.*;
 
 Game _game = new Game();
 long _lastTime = 0;
-project outer;
+MxGame outer;
 GL4 gl;
 PGraphicsOpenGL pgl;
 
