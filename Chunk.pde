@@ -9,7 +9,7 @@ class Chunk {
   static final int CHUNK_MIN_Y = -64;
   final IVector2 position;
   final IVector3[] directions = { new IVector3(0, 1, 0), new IVector3(0, -1, 0), new IVector3(1, 0, 0), new IVector3(-1, 0, 0), new IVector3(0, 0, 1), new IVector3(0, 0, -1) };
-  Map<IVector3, Block> blocks = new HashMap<>();
+  Map<IVector3, Block> blocks = new HashMap<>(CHUNK_BLOCKS * CHUNK_BLOCKS);
   int minY;
   int maxY;
   World world;

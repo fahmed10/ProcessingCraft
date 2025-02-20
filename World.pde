@@ -1,5 +1,5 @@
 class World {
-  Map<IVector2, Chunk> chunks = new HashMap<>();
+  Map<IVector2, Chunk> chunks = new HashMap<>(32);
 
   Chunk getChunk(IVector2 position, boolean generate) {
     if (chunks.containsKey(position)) {
