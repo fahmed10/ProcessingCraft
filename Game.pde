@@ -9,9 +9,9 @@ class Game {
   World world = new World();
   PShader shader;
   PImage blockAtlas;
-  float drawRadius = 2000;
+  float drawRadius = 2500;
   final float maxMouseDelta = 6000;
-  PVector skyColor = new PVector(0, 0.8, 1);
+  PVector skyColor = new PVector(0, 0.85, 1);
   PVector sunDirection = new PVector(1, -2, 0.75).normalize();
 
   void start() {
@@ -24,15 +24,19 @@ class Game {
     shader(shader);
     shader.set("tex", blockAtlas);
     shader.set("fogFar", drawRadius - 200);
-    shader.set("fogNear", (drawRadius - 200) * 0.93 - 15);
+    shader.set("fogNear", (drawRadius - 200) * 0.9 - 20);
     shader.set("fogColor", skyColor);
     shader.set("sunDirection", sunDirection);
     
-    new SoundFile(outer, "audio/music.mp3").play(1, 0.5);
+    SoundFile music = new SoundFile(outer, "audio/music.mp3");
+    music.loop();
+    music.play(1, 0.5);
+    
     player.start();
   }
 
   void update(float delta) {
+    shader.set("viewportSize", (float)width, (float)height);
     background(Utils.toColor(skyColor));
     noStroke();
     gl.glEnable(GL.GL_CULL_FACE);

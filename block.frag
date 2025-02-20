@@ -13,6 +13,7 @@ uniform float fogFar;
 uniform float fogNear;
 uniform vec3 fogColor;
 uniform vec3 sunDirection;
+uniform vec2 viewportSize;
 const float atlasSize = 512.0;
 const float atlasItemSize = 16.0;
 const float atlasItemUvSize = atlasItemSize / atlasSize;
@@ -34,12 +35,19 @@ vec3 light(vec3 color) {
 }
 
 void main() {
+    float z = gl_FragCoord.z / gl_FragCoord.w;
+    z += pow(abs(gl_FragCoord.x / viewportSize.x - 0.5), 2.0) * (fogFar / 2.0);
+
+    if (z >= fogFar) {
+        gl_FragColor = vec4(fogColor, 1);
+        return;
+    }
+
     int face = int(vertColor.r * 256.0 * 256.0) + int(vertColor.g * 256.0);
     vec2 ruv = faceUv(uv, face);
     vec3 color = texture2D(tex, ruv).rgb;
     color = light(color);
 
-    float z = gl_FragCoord.z / gl_FragCoord.w;
     float fogFactor = clamp((fogFar - z) / (fogFar - fogNear), 0.0, 1.0);
     gl_FragColor = vec4(mix(fogColor, color, fogFactor), 1);
 }
