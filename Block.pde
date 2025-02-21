@@ -1,4 +1,4 @@
-class Block {
+static class Block {
   static final int BLOCK_SIZE = 15;
   IVector3 position;
   Chunk chunk;
