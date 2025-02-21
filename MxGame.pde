@@ -20,9 +20,9 @@ void setup() {
 }
 
 void draw() {
-  Input.tick(width, height, mouseX, mouseY);
-  double delta = (double)((double)System.nanoTime() - _lastTime) * 1e-9;
+  double delta = (double)(System.nanoTime() - _lastTime) * 1e-9;
   _lastTime = System.nanoTime();
+  Input.tick(width, height, mouseX, mouseY);
   _game.update((float)delta);
 }
 
@@ -32,4 +32,12 @@ void keyPressed() {
 
 void keyReleased() {
   Input.keyReleased(key, keyCode);
+}
+
+void mousePressed() {
+  Input.mousePressed(mouseButton);
+}
+
+void mouseReleased() {
+  Input.mouseReleased(mouseButton);
 }
