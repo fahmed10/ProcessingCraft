@@ -9,9 +9,11 @@ class Game {
   Player player = new Player(world);
   PShader shader;
   PImage blockAtlas;
-  float drawRadius = 3000;
+  float drawRadius = 4000;
   PVector skyColor = new PVector(0, 0.85, 1);
   PVector sunDirection = new PVector(1, -2, 0.75).normalize();
+  int chunksGenerated;
+  long frameStartTime;
 
   void start() {
     frameRate(1000);
@@ -36,6 +38,7 @@ class Game {
   }
 
   void update(float delta) {
+    frameStartTime = System.nanoTime();
     shader.set("viewportSize", (float)width, (float)height);
     background(Utils.toColor(skyColor));
     noStroke();
@@ -54,52 +57,60 @@ class Game {
 
     drawTerrain();
   }
+  
+  double frameTime() {
+    return (double)(System.nanoTime() - frameStartTime) * 1e-9;
+  }
 
   void drawTerrain() {
     IVector2 currentChunkPosition = CoordSpace.getWorldChunkPosition(player.position);
     int drawChunks = ceil(drawRadius / Chunk.CHUNK_SIZE);
-    int chunksGenerated = 0;
+    chunksGenerated = 0;
+
+    for (int x = -1; x <= 1; x++) {
+      for (int y = -1; y <= 1; y++) {
+        drawChunk(currentChunkPosition, x, y);
+      }
+    }
 
     for (int x = -drawChunks; x <= drawChunks; x++) {
       for (int y = -drawChunks; y <= drawChunks; y++) {
-        IVector2 chunkPos = IVector2.use().set(currentChunkPosition.x + x, currentChunkPosition.y + y);
-
-        PVector chunkMin = Utils.useVector();
-        PVector chunkMax = Utils.useVector();
-        CoordSpace.getChunkWorldCorners(chunkPos, chunkMin, chunkMax);
-        boolean inFrustum = player.camera.frustum.containsBox(chunkMin, chunkMax);
-
-        if (!inFrustum) {
-          Utils.free(chunkMin);
-          Utils.free(chunkMax);
-          chunkPos.free();
+        if (abs(x) <= 1 && abs(y) <= 1) {
           continue;
         }
-
-        if (!world.chunks.containsKey(chunkPos) || !world.chunks.get(chunkPos).hasMesh()) {
-          if (chunksGenerated >= 3) {
-            chunkPos.free();
-            Utils.free(chunkMin);
-            Utils.free(chunkMax);
-            continue;
-          } else {
-            chunksGenerated++;
-          }
-        }
-
-        Chunk chunk = world.getChunk(chunkPos, true);
-        chunk.getWorldCorners(chunkMin, chunkMax);
-        inFrustum = player.camera.frustum.containsBox(chunkMin, chunkMax);
-        chunkPos.free();
-        Utils.free(chunkMin);
-        Utils.free(chunkMax);
-
-        if (!inFrustum) {
-          continue;
-        }
-
-        chunk.draw();
+        
+        drawChunk(currentChunkPosition, x, y);
       }
     }
+
+    currentChunkPosition.free();
+  }
+
+  void drawChunk(IVector2 currentChunkPosition, int x, int y) {
+    IVector2 chunkPos = IVector2.use().set(currentChunkPosition.x, currentChunkPosition.y).add(x, y);
+
+    PVector chunkMin = Utils.useVector();
+    PVector chunkMax = Utils.useVector();
+    Chunk chunk = world.getChunk(chunkPos, false);
+    chunkPos.free();
+    chunk.getWorldCorners(chunkMin, chunkMax);
+    boolean inFrustum = player.camera.frustum.containsBox(chunkMin, chunkMax);
+    Utils.free(chunkMin);
+    Utils.free(chunkMax);
+
+    if (!inFrustum) {
+      return;
+    }
+
+    if (!chunk.hasMesh()) {
+      if (chunksGenerated >= 1 && frameTime() > 1d/60) {
+        return;
+      } else {
+        chunk.generateMesh();
+        chunksGenerated++;
+      }
+    }
+
+    chunk.draw();
   }
 }
