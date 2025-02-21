@@ -31,6 +31,23 @@ class Chunk {
     model = null;
   }
 
+  void setBlock(IVector3 position, BlockType type) {  
+    if (blocks.containsKey(position)) {
+      blocks.get(position).type = type;
+      position.free();
+      return;
+    }
+    
+    if (position.y < minY) minY = position.y;
+    if (position.y > maxY) maxY = position.y;
+
+    blocks.put(position, new Block(this, position, type));
+  }
+
+  void setBlock(int x, int y, int z, BlockType type) {
+    setBlock(IVector3.use().set(x, y, z), type);
+  }
+
   void generateMesh() {
     PShapeOpenGL mesh = PShapeOpenGL.createShape(pgl, createShape());
     mesh.beginShape(QUADS);

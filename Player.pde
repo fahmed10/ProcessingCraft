@@ -32,14 +32,7 @@ class Player extends Object3D {
     if (Input.isMouseButtonDown(Mouse.LEFT)) {
       Pair<IVector2, IVector3> pos = CoordSpace.getWorldBlockPosition(position);
       Chunk chunk = world.getChunk(pos.first, false);
-
-      if (chunk.blocks.containsKey(pos.second)) {
-        chunk.blocks.get(pos.second).type = currentBlockType;
-        pos.second.free();
-      } else {
-        chunk.blocks.put(pos.second, new Block(chunk, pos.second, currentBlockType));
-      }
-
+      chunk.setBlock(pos.second, currentBlockType);
       chunk.markMeshOutdated();
       pos.first.free();
     }
