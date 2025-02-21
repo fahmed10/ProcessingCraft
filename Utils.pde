@@ -11,7 +11,7 @@ static class Utils {
   }
 
   static void free(PVector vector) {
-    if (pool.size() > 1000) {
+    if (pool.size() > 100) {
       throw new Error("PVector: Memory leak detected.");
     }
     

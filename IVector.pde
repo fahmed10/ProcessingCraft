@@ -19,13 +19,13 @@ static class IVector2 {
   }
 
   void free() {
-    if (pool.size() > 1000) {
+    if (pool.size() > 100) {
       throw new Error("IVector2: Memory leak detected.");
     }
-    
+
     pool.push(this);
   }
-  
+
   IVector2 copy() {
     return use().set(x, y);
   }
@@ -36,9 +36,22 @@ static class IVector2 {
     return this;
   }
 
-  void add(IVector2 b) {
+  IVector2 set(IVector2 b) {
+    this.x = b.x;
+    this.y = b.y;
+    return this;
+  }
+
+  IVector2 add(IVector2 b) {
     x += b.x;
     y += b.y;
+    return this;
+  }
+
+  IVector2 add(int x, int y) {
+    this.x += x;
+    this.y += y;
+    return this;
   }
 
   void sub(IVector2 b) {
@@ -88,10 +101,10 @@ static class IVector3 {
   }
 
   void free() {
-    if (pool.size() > 1000) {
+    if (pool.size() > 100) {
       throw new Error("IVector3: Memory leak detected.");
     }
-    
+
     pool.push(this);
   }
 
