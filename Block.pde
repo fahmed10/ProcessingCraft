@@ -10,8 +10,8 @@ static class Block {
     this.type = type;
   }
 
-  void getWorldPosition(PVector out) {
-    CoordSpace.getBlockWorldPosition(chunk.position, position, out);
+  PVector getWorldPosition() {
+    return CoordSpace.getBlockWorldPosition(chunk.position, position);
   }
 }
 

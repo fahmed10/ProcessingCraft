@@ -20,8 +20,8 @@ class Chunk {
     this.world = world;
   }
 
-  PVector getWorldCenter(PVector out) {
-    return CoordSpace.getChunkWorldCenter(position, out);
+  PVector getWorldCenter() {
+    return CoordSpace.getChunkWorldCenter(position);
   }
 
   void getWorldCorners(PVector outMin, PVector outMax) {
@@ -74,7 +74,7 @@ class Chunk {
     offsetPosition = offsetPosition.set(offsetPosition.x - offset.x * CHUNK_BLOCKS, offsetPosition.y, offsetPosition.z - offset.z * CHUNK_BLOCKS);
     return chunk.blocks.containsKey(offsetPosition);
   }
-  
+
   boolean hasMesh() {
     return model != null;
   }

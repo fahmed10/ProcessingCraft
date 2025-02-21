@@ -14,13 +14,14 @@ class Player extends Object3D {
 
     if (Input.isKeyDown(Key.SHIFT)) speed *= 2;
 
-    PVector movement = new PVector();
+    PVector movement = Utils.useVector().set(0, 0, 0);
     if (Input.isKeyDown('d')) movement.add(camera.right);
     if (Input.isKeyDown('a')) movement.add(camera.right.mult(-1));
     if (Input.isKeyDown('w')) movement.add(camera.forward);
     if (Input.isKeyDown('s')) movement.add(camera.forward.mult(-1));
     movement.mult(speed);
     position.add(movement);
+    Utils.free(movement);
 
     if (Input.isKeyDown(UP)) camera.rotation.add(-speed, 0, 0);
     if (Input.isKeyDown(DOWN)) camera.rotation.add(speed, 0, 0);
