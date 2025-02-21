@@ -29,21 +29,17 @@ static class Plane {
     return d;
   }
 
-  // From: https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
   boolean intersectsBox(PVector min, PVector max) {
-    PVector[] points = new PVector[] {
-      // Min side
-      new PVector(min.x, min.y, min.z),
-      new PVector(max.x, min.y, min.z),
-      new PVector(min.x, max.y, min.z),
-      new PVector(min.x, min.y, max.z),
-      // Max side
-      new PVector(max.x, max.y, max.z),
-      new PVector(min.x, max.y, max.z),
-      new PVector(max.x, min.y, max.z),
-      new PVector(max.x, max.y, min.z)
-    };
-
-    return Arrays.stream(points).anyMatch(p -> distanceTo(p) > 0);
+    PVector point = Utils.useVector();
+    boolean intersect = distanceTo(point.set(min.x, min.y, min.z)) > 0 ||
+      distanceTo(point.set(max.x, min.y, min.z)) > 0 ||
+      distanceTo(point.set(min.x, max.y, min.z)) > 0 ||
+      distanceTo(point.set(min.x, min.y, max.z)) > 0 ||
+      distanceTo(point.set(max.x, max.y, max.z)) > 0 ||
+      distanceTo(point.set(min.x, max.y, max.z)) > 0 ||
+      distanceTo(point.set(max.x, min.y, max.z)) > 0 ||
+      distanceTo(point.set(max.x, max.y, min.z)) > 0;
+    Utils.free(point);
+    return intersect;
   }
 }
