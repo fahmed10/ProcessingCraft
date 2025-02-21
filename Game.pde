@@ -42,6 +42,14 @@ class Game {
     gl.glEnable(GL.GL_CULL_FACE);
     println(delta * 1e3 + "ms (" + (int)frameRate + " FPS)");
 
+    if (Input.isKeyDown(Key.ESC)) {
+      Input.setPointerLocked(false);
+    }
+
+    if (Input.isMouseButtonDown(Mouse.LEFT)) {
+      Input.setPointerLocked(true);
+    }
+
     player.update(delta);
 
     drawTerrain();

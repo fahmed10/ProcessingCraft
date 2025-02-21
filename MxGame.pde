@@ -28,6 +28,10 @@ void draw() {
 
 void keyPressed() {
   Input.keyPressed(key, keyCode);
+
+  if (key == ESC) {
+    key = 0;
+  }
 }
 
 void keyReleased() {

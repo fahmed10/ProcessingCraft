@@ -10,11 +10,11 @@ static class Input {
   static boolean isKeyDown(int key) {
     return keysDown[key];
   }
-  
+
   static boolean isKeyDown(char key) {
     return keysDown[Character.toLowerCase(key)];
   }
-  
+
   static boolean isMouseButtonDown(int button) {
     return buttonsDown[button];
   }
@@ -39,10 +39,14 @@ static class Input {
       n++;
       return;
     }
-    
-    if (r.hasFocus() && r.isVisible()) {
+
+    if (r.hasFocus() && r.isVisible() && !r.isPointerVisible()) {
       mouseMovement.set(mouseX - (width / 2), mouseY - (height / 2));
       r.warpPointer(width / 2, height / 2);
+    }
+
+    if (r.isPointerVisible() && !r.isPointerConfined()) {
+      mouseMovement.set(0, 0);
     }
   }
 
@@ -53,11 +57,11 @@ static class Input {
   private static void keyReleased(int key, int keyCode) {
     keysDown[key == CODED ? keyCode : Character.toLowerCase(key)] = false;
   }
-  
+
   private static void mousePressed(int mouseButton) {
     buttonsDown[mouseButton] = true;
   }
-  
+
   private static void mouseReleased(int mouseButton) {
     buttonsDown[mouseButton] = false;
   }
@@ -65,19 +69,19 @@ static class Input {
 
 static class Key {
   static int
-  SHIFT = 16,
-  CTRL = 17,
-  LALT = 18,
-  RALT = 19,
-  ESC = 27,
-  BACKSPACE = 8,
-  INSERT = 26,
-  DELETE = 147;
+    SHIFT = 16,
+    CTRL = 17,
+    LALT = 18,
+    RALT = 19,
+    ESC = 27,
+    BACKSPACE = 8,
+    INSERT = 26,
+    DELETE = 147;
 }
 
 static class Mouse {
   static int
-  LEFT = 37,
-  RIGHT = 39,
-  MIDDLE = 3;
+    LEFT = 37,
+    RIGHT = 39,
+    MIDDLE = 3;
 }
