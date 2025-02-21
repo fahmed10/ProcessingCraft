@@ -35,5 +35,10 @@ static class CoordSpace {
   static IVector2 getWorldChunkPosition(PVector position) {
     return IVector2.use().set(floor(position.x / Chunk.CHUNK_SIZE), floor(position.z / Chunk.CHUNK_SIZE));
   }
+
+  static Pair<IVector2, IVector3> getWorldBlockPosition(PVector position) {
+    IVector2 chunkPos = getWorldChunkPosition(position);
+    IVector3 blockPos = IVector3.use().set(Math.floorMod(floor(position.x % Chunk.CHUNK_SIZE / Block.BLOCK_SIZE), Chunk.CHUNK_BLOCKS), ceil(position.y / Block.BLOCK_SIZE), Math.floorMod(floor(position.z % Chunk.CHUNK_SIZE / Block.BLOCK_SIZE), Chunk.CHUNK_BLOCKS));
+    return new Pair<>(chunkPos, blockPos);
   }
 }

@@ -5,8 +5,8 @@ import java.time.*;
 import processing.sound.*;
 
 class Game {
-  Player player = new Player();
   World world = new World();
+  Player player = new Player(world);
   PShader shader;
   PImage blockAtlas;
   float drawRadius = 2500;

@@ -3,7 +3,13 @@ class Player extends Object3D {
   float sprintSpeed = 400;
   float mouseSensitivity = 1.5;
   float minPitch = -80, maxPitch = 80;
-  private Camera3D camera = new Camera3D();
+  Camera3D camera = new Camera3D();
+  private World world;
+  private BlockType currentBlockType = BlockType.DIRT;
+
+  Player(World world) {
+    this.world = world;
+  }
 
   void start() {
     position.set(0, Block.BLOCK_SIZE * 6, 0);
@@ -23,16 +29,30 @@ class Player extends Object3D {
     position.add(movement);
     Utils.free(movement);
 
-    if (Input.isKeyDown(UP)) camera.rotation.add(-speed, 0, 0);
-    if (Input.isKeyDown(DOWN)) camera.rotation.add(speed, 0, 0);
-    if (Input.isKeyDown(LEFT)) camera.rotation.add(0, -speed, 0);
-    if (Input.isKeyDown(RIGHT)) camera.rotation.add(0, speed, 0);
+    if (Input.isMouseButtonDown(Mouse.LEFT)) {
+      Pair<IVector2, IVector3> pos = CoordSpace.getWorldBlockPosition(position);
+      Chunk chunk = world.getChunk(pos.first, false);
+
+      if (chunk.blocks.containsKey(pos.second)) {
+        chunk.blocks.get(pos.second).type = currentBlockType;
+        pos.second.free();
+      } else {
+        chunk.blocks.put(pos.second, new Block(chunk, pos.second, currentBlockType));
+      }
+
+      chunk.markMeshOutdated();
+      pos.first.free();
+    }
+    
+    if (Input.isMouseButtonDown(Mouse.RIGHT)) {
+      currentBlockType = BlockType.fromId((currentBlockType.getId() + 1) % BlockType.ids());
+    }
 
     PVector mouse = Input.getMouseMovement();
     float mouseDelta = (0.04 + delta * 7) * mouseSensitivity;
     camera.rotation.add(mouse.y * mouseDelta, mouse.x * mouseDelta);
     camera.rotation.x = constrain(camera.rotation.x, minPitch, maxPitch);
-    
+
     camera.position.set(position);
     camera.use();
   }

@@ -10,8 +10,7 @@ class Chunk {
   final IVector2 position;
   final IVector3[] directions = { new IVector3(0, 1, 0), new IVector3(0, -1, 0), new IVector3(1, 0, 0), new IVector3(-1, 0, 0), new IVector3(0, 0, 1), new IVector3(0, 0, -1) };
   Map<IVector3, Block> blocks = new HashMap<>(CHUNK_BLOCKS * CHUNK_BLOCKS);
-  int minY;
-  int maxY;
+  int minY, maxY;
   World world;
   private Model3D model;
 
@@ -26,6 +25,10 @@ class Chunk {
 
   void getWorldCorners(PVector outMin, PVector outMax) {
     CoordSpace.getChunkWorldCorners(this, outMin, outMax);
+  }
+
+  void markMeshOutdated() {
+    model = null;
   }
 
   void generateMesh() {

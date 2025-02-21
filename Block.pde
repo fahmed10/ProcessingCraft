@@ -18,12 +18,22 @@ static class Block {
 enum BlockType {
   GRASS(1, 2, 0, 0, 0, 0),
   DIRT(2, 2, 2, 2, 2, 2),
-  SAND(4, 4, 4, 4, 4, 4);
+  SAND(4, 4, 4, 4, 4, 4),
+  DEBUG(3, 3, 3, 3, 3, 3);
 
+  private static BlockType[] values = BlockType.values();
   private int[] faceIds;
 
   private BlockType(int py, int ny, int px, int nx, int pz, int nz) {
     this.faceIds = new int[] {py, ny, px, nx, pz, nz};
+  }
+  
+  static BlockType fromId(int id) {
+    return values[id];
+  }
+  
+  static int ids() {
+    return values.length;
   }
 
   int getId() {
