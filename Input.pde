@@ -4,7 +4,7 @@ static class Input {
   private static boolean[] keysDown = new boolean[Short.MAX_VALUE];
   private static boolean[] buttonsDown = new boolean[64];
   private static PVector mouseMovement = new PVector();
-  private static GLWindow r;
+  private static GLWindow window;
   private static int n = 0;
 
   static boolean isKeyDown(int key) {
@@ -24,14 +24,14 @@ static class Input {
   }
 
   static void setPointerLocked(boolean locked) {
-    r.confinePointer(locked);
-    r.setPointerVisible(!locked);
+    window.confinePointer(locked);
+    window.setPointerVisible(!locked);
   }
 
   static void init(PSurface surface, int width, int height) {
-    r = (GLWindow)surface.getNative();
+    window = (GLWindow)surface.getNative();
     setPointerLocked(true);
-    r.warpPointer(width/2, height/2);
+    window.warpPointer(width/2, height/2);
   }
 
   static void tick(int width, int height, int mouseX, int mouseY) {
@@ -40,12 +40,12 @@ static class Input {
       return;
     }
 
-    if (r.hasFocus() && r.isVisible() && !r.isPointerVisible()) {
+    if (window.hasFocus() && window.isVisible() && !window.isPointerVisible()) {
       mouseMovement.set(mouseX - (width / 2), mouseY - (height / 2));
-      r.warpPointer(width / 2, height / 2);
+      window.warpPointer(width / 2, height / 2);
     }
 
-    if (r.isPointerVisible() && !r.isPointerConfined()) {
+    if (window.isPointerVisible() && !window.isPointerConfined()) {
       mouseMovement.set(0, 0);
     }
   }
