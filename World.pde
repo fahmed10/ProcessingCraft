@@ -1,5 +1,5 @@
 class World {
-  Map<IVector2, Chunk> chunks = new HashMap<>(32);
+  Map<IVector2, Chunk> chunks = new HashMap<>(64);
 
   World(int seed) {
     noiseSeed(seed);
@@ -45,5 +45,41 @@ class World {
     }
 
     return chunk;
+  }
+  
+  Block getWorldBlock(PVector position) {
+    Pair<IVector2, IVector3> pair = CoordSpace.getWorldBlockPosition(position);
+    if (!chunks.containsKey(pair.first)) {
+      pair.first.free();
+      pair.second.free();
+      return null;
+    }
+    
+    Chunk chunk = chunks.get(pair.first);
+    Block block = chunk.blocks.get(pair.second);
+    pair.first.free();
+    pair.second.free();
+    return block;
+  }
+  
+  Block raycast(PVector position, PVector direction, float maxDistance) {
+    final float step = Block.BLOCK_SIZE / 15f;
+    float distance = 0f;
+    PVector currentPosition = Utils.useVector().set(position);
+    
+    while (distance <= maxDistance) {
+      Block block = getWorldBlock(currentPosition);
+      
+      if (block != null) {
+        Utils.free(currentPosition);
+        return block;
+      }
+      
+      distance += step;
+      currentPosition = currentPosition.add(direction.copy().mult(step));
+    }
+    
+    Utils.free(currentPosition);
+    return null;
   }
 }
