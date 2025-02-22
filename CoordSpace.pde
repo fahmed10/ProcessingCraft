@@ -1,4 +1,6 @@
 static class CoordSpace {
+  static final IVector3[] DIRECTIONS = { new IVector3(0, 1, 0), new IVector3(0, -1, 0), new IVector3(1, 0, 0), new IVector3(-1, 0, 0), new IVector3(0, 0, 1), new IVector3(0, 0, -1) };
+  
   static PVector getChunkWorldCenter(IVector2 position) {
     PVector out = Utils.useVector().set(position.x, 0, position.y);
     return out.mult(Chunk.CHUNK_SIZE).add(Chunk.CHUNK_SIZE / 2f, 0, Chunk.CHUNK_SIZE / 2f);

@@ -8,7 +8,6 @@ class Chunk {
   static final int CHUNK_MAX_Y = 128;
   static final int CHUNK_MIN_Y = -64;
   final IVector2 position;
-  final IVector3[] directions = { new IVector3(0, 1, 0), new IVector3(0, -1, 0), new IVector3(1, 0, 0), new IVector3(-1, 0, 0), new IVector3(0, 0, 1), new IVector3(0, 0, -1) };
   Map<IVector3, Block> blocks = new HashMap<>(CHUNK_BLOCKS * CHUNK_BLOCKS);
   int minY, maxY;
   World world;
@@ -61,6 +60,7 @@ class Chunk {
         if (block.position.y > maxY) maxY = block.position.y;
 
         int[] faces = block.type.getFaceIds();
+        IVector3[] directions = CoordSpace.DIRECTIONS;
 
         for (int i = 0; i < directions.length; i++) {
           if (!blockAtOffset(block.position, directions[i])) {
