@@ -1,6 +1,10 @@
 class World {
   Map<IVector2, Chunk> chunks = new HashMap<>(32);
 
+  World(int seed) {
+    noiseSeed(seed);
+  }
+
   Chunk getChunk(IVector2 position, boolean generate) {
     if (chunks.containsKey(position)) {
       Chunk chunk = chunks.get(position);
@@ -9,7 +13,7 @@ class World {
       }
       return chunk;
     }
-    
+
     IVector2 positionCopy = position.copy();
     Chunk chunk = generateChunk(positionCopy);
 
@@ -20,7 +24,7 @@ class World {
     chunks.put(positionCopy, chunk);
     return chunk;
   }
-  
+
   private float perlinNoise2d(float x, float y, float scale) {
     return noise(x * scale + 92834, y * scale - 52976);
   }
@@ -32,7 +36,7 @@ class World {
       for (int z = 0; z < Chunk.CHUNK_BLOCKS; z++) {
         float noiseValue = perlinNoise2d(position.x * Chunk.CHUNK_BLOCKS + x, position.y * Chunk.CHUNK_BLOCKS + z, 0.075);
         int y = round(noiseValue * 6);
-        
+
         chunk.setBlock(x, y, z, y <= 2 ? BlockType.SAND : BlockType.GRASS);
         for (int i = 1; y - i >= -5; i++) {
           chunk.setBlock(x, y - i, z, BlockType.DIRT);

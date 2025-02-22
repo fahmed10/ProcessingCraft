@@ -5,7 +5,7 @@ import java.time.*;
 import processing.sound.*;
 
 class Game {
-  World world = new World();
+  World world = new World(321225);
   Player player = new Player(world);
   PShader shader;
   PImage blockAtlas;
@@ -103,7 +103,7 @@ class Game {
     }
 
     if (!chunk.hasMesh()) {
-      if (chunksGenerated >= 1 && frameTime() > 1d/60) {
+      if (chunksGenerated >= 1 && frameTime() > 1d/70) {
         return;
       } else {
         chunk.generateMesh();
