@@ -6,6 +6,7 @@ long _lastTime = 0;
 MxGame outer;
 GL4 gl;
 PGraphicsOpenGL pgl;
+DebugDrawer Debug = new DebugDrawer();
 
 void setup() {
   size(800, 600, P3D);
