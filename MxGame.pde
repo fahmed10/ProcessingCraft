@@ -10,6 +10,7 @@ DebugDrawer Debug = new DebugDrawer();
 
 void setup() {
   size(800, 600, P3D);
+  hint(ENABLE_STROKE_PERSPECTIVE);
   background(0);
   outer = this;
   Input.init(surface, width, height);

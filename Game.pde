@@ -42,7 +42,7 @@ class Game {
     shader.set("viewportSize", (float)width, (float)height);
     background(Utils.toColor(skyColor));
     noStroke();
-    gl.glEnable(GL.GL_CULL_FACE);
+    // gl.glEnable(GL.GL_CULL_FACE);
     println(delta * 1e3 + "ms (" + (int)frameRate + " FPS)");
 
     if (Input.isKeyDown(Key.ESC)) {
@@ -53,11 +53,10 @@ class Game {
       Input.setPointerLocked(true);
     }
 
-    player.update(delta);
-
     drawTerrain();
+    player.update(delta);
   }
-  
+
   double frameTime() {
     return (double)(System.nanoTime() - frameStartTime) * 1e-9;
   }
@@ -78,7 +77,7 @@ class Game {
         if (abs(x) <= 1 && abs(y) <= 1) {
           continue;
         }
-        
+
         drawChunk(currentChunkPosition, x, y);
       }
     }

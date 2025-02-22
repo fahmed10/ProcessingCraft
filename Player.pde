@@ -36,7 +36,7 @@ class Player extends Object3D {
       chunk.markMeshOutdated();
       pos.first.free();
     }
-    
+
     if (Input.isMouseButtonDown(Mouse.RIGHT)) {
       currentBlockType = BlockType.fromId((currentBlockType.getId() + 1) % BlockType.ids());
     }
@@ -45,6 +45,22 @@ class Player extends Object3D {
     float mouseDelta = (0.04 + delta * 7) * mouseSensitivity;
     camera.rotation.add(mouse.y * mouseDelta, mouse.x * mouseDelta);
     camera.rotation.x = constrain(camera.rotation.x, minPitch, maxPitch);
+
+    Block block = world.raycast(position, camera.forward, Block.BLOCK_SIZE * 10);
+    if (block != null) {
+      PVector blockPosition = block.getWorldPosition();
+      resetShader();
+      pushMatrix();
+      translate(blockPosition.x, blockPosition.y - Block.BLOCK_SIZE / 2f + 0.02, blockPosition.z);
+      noFill();
+      strokeJoin(ROUND);
+      stroke(0, 0, 0, 150);
+      strokeWeight(0.15);
+      box(Block.BLOCK_SIZE + 0.025);
+      fill(255);
+      shader(_game.shader);
+      popMatrix();
+    }
 
     camera.position.set(position);
     camera.use();
