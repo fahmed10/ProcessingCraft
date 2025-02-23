@@ -24,6 +24,13 @@ class World {
     chunks.put(positionCopy, chunk);
     return chunk;
   }
+  
+  Chunk getChunk(int x, int y) {
+    IVector2 temp = IVector2.use().set(x, y);
+    Chunk chunk = getChunk(temp, false);
+    temp.free();
+    return chunk;
+  }
 
   private float perlinNoise2d(float x, float y, float scale) {
     return noise(x * scale + 92834, y * scale - 52976);

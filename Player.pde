@@ -34,14 +34,14 @@ class Player extends Object3D {
     if (cursor != null) {
       if (Input.isMouseButtonPressed(Mouse.LEFT)) {
         Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor);
-        pair.first.blocks.remove(pair.second);
-        pair.first.markMeshOutdated();
+        pair.first.removeBlock(pair.second);
+        pair.second.free();
       }
 
       if (Input.isMouseButtonPressed(Mouse.RIGHT)) {
         Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor.copy().add(cursorOffset));
         pair.first.setBlock(pair.second, currentBlockType);
-        pair.first.markMeshOutdated();
+        pair.second.free();
       }
 
       if (Input.isKeyPressed('e')) {

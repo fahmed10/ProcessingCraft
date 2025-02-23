@@ -30,21 +30,43 @@ class Chunk {
     model = null;
   }
 
-  void setBlock(IVector3 position, BlockType type) {  
-    if (blocks.containsKey(position)) {
-      blocks.get(position).type = type;
-      position.free();
+  void setBlock(IVector3 blockPos, BlockType type) {  
+    if (blocks.containsKey(blockPos)) {
+      blocks.get(blockPos).type = type;
       return;
     }
     
-    if (position.y < minY) minY = position.y;
-    if (position.y > maxY) maxY = position.y;
+    if (blockPos.y < minY) minY = blockPos.y;
+    if (blockPos.y > maxY) maxY = blockPos.y;
 
-    blocks.put(position, new Block(this, position, type));
+    IVector3 blockPosCopy = blockPos.copy();
+    blocks.put(blockPosCopy, new Block(this, blockPosCopy, type));
+    markMeshOutdated();
   }
 
   void setBlock(int x, int y, int z, BlockType type) {
-    setBlock(IVector3.use().set(x, y, z), type);
+    IVector3 temp = IVector3.use().set(x, y, z);
+    setBlock(temp, type);
+    temp.free();
+  }
+  
+  void removeBlock(IVector3 blockPos) {
+    blocks.remove(blockPos);
+    markMeshOutdated();
+    
+    int chunkX = blockPos.x == 0 ? -1 : 0;
+    int chunkY = blockPos.z == 0 ? -1 : 0;
+    
+    if (blockPos.x == CHUNK_BLOCKS - 1) chunkX = 1;
+    if (blockPos.z == CHUNK_BLOCKS - 1) chunkY = 1;
+    
+    if (chunkX != 0) {
+      world.getChunk(position.x + chunkX, position.y).markMeshOutdated();
+    }
+    
+    if (chunkY != 0) {
+      world.getChunk(position.x, position.y + chunkY).markMeshOutdated();
+    }
   }
 
   void generateMesh() {
