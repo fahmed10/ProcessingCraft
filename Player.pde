@@ -6,6 +6,7 @@ class Player extends Object3D {
   Camera3D camera = new Camera3D();
   private World world;
   private BlockType currentBlockType = BlockType.DIRT;
+  private IVector3 cursor = new IVector3();
 
   Player(World world) {
     this.world = world;
@@ -29,12 +30,10 @@ class Player extends Object3D {
     position.add(movement);
     Utils.free(movement);
 
-    if (Input.isMouseButtonDown(Mouse.LEFT)) {
-      Pair<IVector2, IVector3> pos = CoordSpace.getWorldBlockPosition(position);
-      Chunk chunk = world.getChunk(pos.first, false);
-      chunk.setBlock(pos.second, currentBlockType);
-      chunk.markMeshOutdated();
-      pos.first.free();
+    if (Input.isMouseButtonDown(Mouse.LEFT) && cursor != null) {
+      Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor);
+      pair.first.setBlock(pair.second, currentBlockType);
+      pair.first.markMeshOutdated();
     }
 
     if (Input.isMouseButtonDown(Mouse.RIGHT)) {
@@ -46,16 +45,19 @@ class Player extends Object3D {
     camera.rotation.add(mouse.y * mouseDelta, mouse.x * mouseDelta);
     camera.rotation.x = constrain(camera.rotation.x, minPitch, maxPitch);
 
-    Block block = world.raycast(position, camera.forward, Block.BLOCK_SIZE * 10);
-    if (block != null) {
-      PVector blockPosition = block.getWorldPosition();
+    RaycastHit raycastHit = world.raycast(position, camera.forward, Block.BLOCK_SIZE * 5);
+    if (raycastHit == null) {
+      cursor = null;
+    } else {
+      cursor = raycastHit.hitBlock.getGlobalPosition().add(raycastHit.blockNormal);
+      PVector blockPosition = raycastHit.hitBlock.getWorldPosition();
       resetShader();
       pushMatrix();
       translate(blockPosition.x, blockPosition.y - Block.BLOCK_SIZE / 2f + 0.02, blockPosition.z);
       noFill();
       strokeJoin(ROUND);
       stroke(0, 0, 0, 150);
-      strokeWeight(0.15);
+      strokeWeight(0.1);
       box(Block.BLOCK_SIZE + 0.025);
       fill(255);
       shader(_game.shader);

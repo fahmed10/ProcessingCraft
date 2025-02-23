@@ -13,6 +13,10 @@ static class Block {
   PVector getWorldPosition() {
     return CoordSpace.getBlockWorldPosition(chunk.position, position);
   }
+  
+  IVector3 getGlobalPosition() {
+    return CoordSpace.getBlockGlobalPosition(chunk.position, position);
+  }
 }
 
 enum BlockType {

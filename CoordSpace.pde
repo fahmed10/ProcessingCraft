@@ -35,12 +35,21 @@ static class CoordSpace {
   }
 
   static IVector2 getWorldChunkPosition(PVector position) {
-    return IVector2.use().set(floor(position.x / Chunk.CHUNK_SIZE), floor(position.z / Chunk.CHUNK_SIZE));
+    return IVector2.use().set(floor((float)(position.x + Block.BLOCK_SIZE / 2f) / Chunk.CHUNK_SIZE), floor((float)(position.z + Block.BLOCK_SIZE / 2f) / Chunk.CHUNK_SIZE));
   }
 
   static Pair<IVector2, IVector3> getWorldBlockPosition(PVector position) {
     IVector2 chunkPos = getWorldChunkPosition(position);
-    IVector3 blockPos = IVector3.use().set(Math.floorMod(floor(position.x % Chunk.CHUNK_SIZE / Block.BLOCK_SIZE), Chunk.CHUNK_BLOCKS), ceil(position.y / Block.BLOCK_SIZE), Math.floorMod(floor(position.z % Chunk.CHUNK_SIZE / Block.BLOCK_SIZE), Chunk.CHUNK_BLOCKS));
+    IVector3 blockPos = IVector3.use().set(Math.floorMod(floor((position.x + Block.BLOCK_SIZE / 2f) % (float)Chunk.CHUNK_SIZE / Block.BLOCK_SIZE), Chunk.CHUNK_BLOCKS), ceil(position.y / Block.BLOCK_SIZE), Math.floorMod(floor((position.z + Block.BLOCK_SIZE / 2f) % (float)Chunk.CHUNK_SIZE / Block.BLOCK_SIZE), Chunk.CHUNK_BLOCKS));
     return new Pair<>(chunkPos, blockPos);
+  }
+  
+  static IVector3 getWorldBlockGlobalPosition(PVector position) {
+    Pair<IVector2, IVector3> pair = getWorldBlockPosition(position);
+    return getBlockGlobalPosition(pair.first, pair.second);
+  }
+  
+  static IVector3 getBlockGlobalPosition(IVector2 chunkPos, IVector3 blockPos) {
+    return IVector3.use().set(chunkPos.x * Chunk.CHUNK_BLOCKS + blockPos.x, blockPos.y, chunkPos.y * Chunk.CHUNK_BLOCKS + blockPos.z);
   }
 }

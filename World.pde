@@ -62,7 +62,20 @@ class World {
     return block;
   }
   
-  Block raycast(PVector position, PVector direction, float maxDistance) {
+  Pair<Chunk, IVector3> globalToLocalBlockPosition(IVector3 position) {
+    IVector2 chunkPos = IVector2.use().set(floor((float)position.x / Chunk.CHUNK_BLOCKS), floor((float)position.z / Chunk.CHUNK_BLOCKS));
+    if (!chunks.containsKey(chunkPos)) {
+      chunkPos.free();
+      return null;
+    }
+    
+    Chunk chunk = chunks.get(chunkPos);
+    IVector3 blockPos = IVector3.use().set(Math.floorMod(position.x, Chunk.CHUNK_BLOCKS), position.y, Math.floorMod(position.z, Chunk.CHUNK_BLOCKS));
+    chunkPos.free();
+    return new Pair(chunk, blockPos);
+  }
+  
+  RaycastHit raycast(PVector position, PVector direction, float maxDistance) {
     final float step = Block.BLOCK_SIZE / 15f;
     float distance = 0f;
     PVector currentPosition = Utils.useVector().set(position);
@@ -71,8 +84,11 @@ class World {
       Block block = getWorldBlock(currentPosition);
       
       if (block != null) {
+        PVector previousPosition = currentPosition.copy().sub(direction.copy().mult(step));
+        IVector3 blockNormal = CoordSpace.getWorldBlockGlobalPosition(previousPosition).sub(CoordSpace.getWorldBlockGlobalPosition(currentPosition));
+        PVector hitNormal = previousPosition.sub(currentPosition).normalize();
         Utils.free(currentPosition);
-        return block;
+        return new RaycastHit(block, hitNormal, blockNormal);
       }
       
       distance += step;
@@ -81,5 +97,17 @@ class World {
     
     Utils.free(currentPosition);
     return null;
+  }
+}
+
+class RaycastHit {
+  Block hitBlock;
+  PVector normal;
+  IVector3 blockNormal;
+  
+  RaycastHit(Block hitBlock, PVector normal, IVector3 blockNormal) {
+    this.hitBlock = hitBlock;
+    this.normal = normal;
+    this.blockNormal = blockNormal;
   }
 }

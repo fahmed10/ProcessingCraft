@@ -125,6 +125,13 @@ static class IVector3 {
     z += b.z;
     return this;
   }
+  
+  IVector3 sub(IVector3 b) {
+    x -= b.x;
+    y -= b.y;
+    z -= b.z;
+    return this;
+  }
 
   @Override
     boolean equals(Object o) {
