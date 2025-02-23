@@ -42,7 +42,6 @@ class Game {
     shader.set("viewportSize", (float)width, (float)height);
     background(Utils.toColor(skyColor));
     noStroke();
-    // gl.glEnable(GL.GL_CULL_FACE);
     println(delta * 1e3 + "ms (" + (int)frameRate + " FPS)");
 
     if (Input.isKeyDown(Key.ESC)) {
@@ -53,7 +52,9 @@ class Game {
       Input.setPointerLocked(true);
     }
 
+    gl.glEnable(GL.GL_CULL_FACE);
     drawTerrain();
+    gl.glDisable(GL.GL_CULL_FACE);
     player.update(delta);
   }
 
