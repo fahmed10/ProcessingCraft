@@ -1,12 +1,13 @@
 class Player extends Object3D {
   float walkSpeed = 200;
   float sprintSpeed = 400;
-  float mouseSensitivity = 1.5;
+  float mouseSensitivity = 1.35;
   float minPitch = -80, maxPitch = 80;
   Camera3D camera = new Camera3D();
   private World world;
   private BlockType currentBlockType = BlockType.DIRT;
   private IVector3 cursor = new IVector3();
+  private IVector3 cursorOffset = new IVector3();
 
   Player(World world) {
     this.world = world;
@@ -30,14 +31,22 @@ class Player extends Object3D {
     position.add(movement);
     Utils.free(movement);
 
-    if (Input.isMouseButtonPressed(Mouse.LEFT) && cursor != null) {
-      Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor);
-      pair.first.setBlock(pair.second, currentBlockType);
-      pair.first.markMeshOutdated();
-    }
+    if (cursor != null) {
+      if (Input.isMouseButtonPressed(Mouse.LEFT)) {
+        Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor);
+        pair.first.blocks.remove(pair.second);
+        pair.first.markMeshOutdated();
+      }
 
-    if (Input.isMouseButtonPressed(Mouse.RIGHT)) {
-      currentBlockType = BlockType.fromId((currentBlockType.getId() + 1) % BlockType.ids());
+      if (Input.isMouseButtonPressed(Mouse.RIGHT)) {
+        Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor.copy().add(cursorOffset));
+        pair.first.setBlock(pair.second, currentBlockType);
+        pair.first.markMeshOutdated();
+      }
+
+      if (Input.isKeyPressed('e')) {
+        currentBlockType = BlockType.fromId((currentBlockType.getId() + 1) % BlockType.ids());
+      }
     }
 
     PVector mouse = Input.getMouseMovement();
@@ -49,7 +58,8 @@ class Player extends Object3D {
     if (raycastHit == null) {
       cursor = null;
     } else {
-      cursor = raycastHit.hitBlock.getGlobalPosition().add(raycastHit.blockNormal);
+      cursor = raycastHit.hitBlock.getGlobalPosition();
+      cursorOffset = raycastHit.blockNormal;
       PVector blockPosition = raycastHit.hitBlock.getWorldPosition();
       resetShader();
       pushMatrix();
