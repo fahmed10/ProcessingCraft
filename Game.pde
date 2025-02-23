@@ -9,7 +9,7 @@ class Game {
   Player player = new Player(world);
   PShader shader;
   PImage blockAtlas;
-  float drawRadius = 4000;
+  float drawRadius = 3000;
   PVector skyColor = new PVector(0, 0.85, 1);
   PVector sunDirection = new PVector(1, -2, 0.75).normalize();
   int chunksGenerated;

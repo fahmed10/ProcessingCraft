@@ -30,13 +30,13 @@ class Player extends Object3D {
     position.add(movement);
     Utils.free(movement);
 
-    if (Input.isMouseButtonDown(Mouse.LEFT) && cursor != null) {
+    if (Input.isMouseButtonPressed(Mouse.LEFT) && cursor != null) {
       Pair<Chunk, IVector3> pair = world.globalToLocalBlockPosition(cursor);
       pair.first.setBlock(pair.second, currentBlockType);
       pair.first.markMeshOutdated();
     }
 
-    if (Input.isMouseButtonDown(Mouse.RIGHT)) {
+    if (Input.isMouseButtonPressed(Mouse.RIGHT)) {
       currentBlockType = BlockType.fromId((currentBlockType.getId() + 1) % BlockType.ids());
     }
 

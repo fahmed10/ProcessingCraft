@@ -26,6 +26,7 @@ void draw() {
   _lastTime = System.nanoTime();
   Input.tick(width, height, mouseX, mouseY);
   _game.update((float)delta);
+  Input.clearState();
 }
 
 void keyPressed() {

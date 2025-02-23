@@ -1,8 +1,10 @@
 import com.jogamp.newt.opengl.GLWindow;
 
 static class Input {
-  private static boolean[] keysDown = new boolean[Short.MAX_VALUE];
-  private static boolean[] buttonsDown = new boolean[64];
+  private static boolean[] keysDown = new boolean[512];
+  private static boolean[] buttonsDown = new boolean[40];
+  private static byte[] keyState = new byte[512];
+  private static byte[] buttonState = new byte[40];
   private static PVector mouseMovement = new PVector();
   private static GLWindow window;
   private static int n = 0;
@@ -15,8 +17,32 @@ static class Input {
     return keysDown[Character.toLowerCase(key)];
   }
 
+  static boolean isKeyPressed(int key) {
+    return keyState[key] == 1;
+  }
+
+  static boolean isKeyPressed(char key) {
+    return keyState[Character.toLowerCase(key)] == 1;
+  }
+
+  static boolean isKeyReleased(int key) {
+    return keyState[key] == 2;
+  }
+
+  static boolean isKeyReleased(char key) {
+    return keyState[Character.toLowerCase(key)] == 2;
+  }
+
   static boolean isMouseButtonDown(int button) {
     return buttonsDown[button];
+  }
+
+  static boolean isMouseButtonPressed(int button) {
+    return buttonState[button] == 1;
+  }
+
+  static boolean isMouseButtonReleased(int button) {
+    return buttonState[button] == 2;
   }
 
   static PVector getMouseMovement() {
@@ -50,20 +76,31 @@ static class Input {
     }
   }
 
+  static void clearState() {
+    Arrays.fill(keyState, (byte)0);
+    Arrays.fill(buttonState, (byte)0);
+  }
+
   private static void keyPressed(int key, int keyCode) {
-    keysDown[key == CODED ? keyCode : Character.toLowerCase(key)] = true;
+    int id = key == CODED ? keyCode : Character.toLowerCase(key);
+    keysDown[id] = true;
+    keyState[id] = 1;
   }
 
   private static void keyReleased(int key, int keyCode) {
-    keysDown[key == CODED ? keyCode : Character.toLowerCase(key)] = false;
+    int id = key == CODED ? keyCode : Character.toLowerCase(key);
+    keysDown[id] = false;
+    keyState[id] = 2;
   }
 
   private static void mousePressed(int mouseButton) {
     buttonsDown[mouseButton] = true;
+    buttonState[mouseButton] = 1;
   }
 
   private static void mouseReleased(int mouseButton) {
     buttonsDown[mouseButton] = false;
+    buttonState[mouseButton] = 2;
   }
 }
 
