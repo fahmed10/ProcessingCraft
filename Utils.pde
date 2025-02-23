@@ -14,8 +14,14 @@ static class Utils {
     if (pool.size() > 100) {
       throw new Error("PVector: Memory leak detected.");
     }
-    
+
     pool.push(vector);
+  }
+
+  static void free(PVector... vectors) {
+    for (PVector vector : vectors) {
+      free(vector);
+    }
   }
 
   static boolean distGreater(PVector a, PVector b, float dist) {

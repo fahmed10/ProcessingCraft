@@ -94,8 +94,7 @@ class Game {
     chunkPos.free();
     chunk.getWorldCorners(chunkMin, chunkMax);
     boolean inFrustum = player.camera.frustum.containsBox(chunkMin, chunkMax);
-    Utils.free(chunkMin);
-    Utils.free(chunkMax);
+    Utils.free(chunkMin, chunkMax);
 
     if (!inFrustum) {
       return;

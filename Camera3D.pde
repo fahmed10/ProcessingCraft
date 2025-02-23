@@ -26,26 +26,29 @@ class Camera3D extends Object3D {
   private void calculateFrustum() {
     float halfVSide = clipFar * tan(fov * 0.5);
     float halfHSide = halfVSide * viewRatio;
-    PVector nearForward = forward.copy().mult(clipNear);
-    PVector farForward = forward.copy().mult(clipFar);
+    PVector nearForward = Utils.useVector().set(forward).mult(clipNear);
+    PVector farForward = Utils.useVector().set(forward).mult(clipFar);
+    PVector vector = Utils.useVector(), vector2 = Utils.useVector(), vector3 = Utils.useVector();
 
-    frustum.near.position.set(position.copy().add(nearForward));
+    frustum.near.position.set(vector.set(position).add(nearForward));
     frustum.near.normal.set(forward).normalize();
 
-    frustum.far.position.set(position.copy().add(farForward));
-    frustum.far.normal.set(forward.copy().mult(-1)).normalize();
+    frustum.far.position.set(vector.set(position).add(farForward));
+    frustum.far.normal.set(vector.set(forward).mult(-1)).normalize();
 
     frustum.top.position.set(position);
-    frustum.top.normal.set(right.copy().cross(farForward.copy().sub(up.copy().mult(-halfVSide)))).normalize();
+    frustum.top.normal.set(vector.set(right).cross(vector2.set(farForward).sub(vector3.set(up).mult(-halfVSide)))).normalize();
 
     frustum.bottom.position.set(position);
-    frustum.bottom.normal.set(farForward.copy().add(up.copy().mult(-halfVSide)).cross(right)).normalize();
+    frustum.bottom.normal.set(vector2.set(farForward).add(vector3.set(up).mult(-halfVSide)).cross(right)).normalize();
 
     frustum.left.position.set(position);
-    frustum.left.normal.set(up.copy().cross(farForward.copy().add(right.copy().mult(-halfHSide)))).normalize();
+    frustum.left.normal.set(vector3.set(up).cross(vector2.set(farForward).add(vector.set(right).mult(-halfHSide)))).normalize();
 
     frustum.right.position.set(position);
-    frustum.right.normal.set(farForward.copy().sub(right.copy().mult(-halfHSide)).cross(up)).normalize();
+    frustum.right.normal.set(vector2.set(farForward).sub(vector.set(right).mult(-halfHSide)).cross(up)).normalize();
+    
+    Utils.free(nearForward, farForward, vector, vector2, vector3);
   }
 
   void use() {
