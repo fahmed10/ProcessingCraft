@@ -29,16 +29,39 @@ void draw() {
   Input.clearState();
 }
 
-void keyPressed() {
+void keyPressed(KeyEvent e) {
   Input.keyPressed(key, keyCode);
+  key = 0;
+  keyCode = 0;
+  postProcessKeyEvent(e);
+}
 
-  if (key == ESC) {
-    key = 0;
+void keyReleased(KeyEvent e) {
+  Input.keyReleased(key, keyCode);
+  key = 0;
+  keyCode = 0;
+  postProcessKeyEvent(e);
+}
+
+void postProcessKeyEvent(KeyEvent e) {
+  var field = getField(e.getClass(), "modifiers");
+  field.setAccessible(true);
+  try {
+    field.set(e, 0);
+  }
+  catch (Exception ex) {
   }
 }
 
-void keyReleased() {
-  Input.keyReleased(key, keyCode);
+java.lang.reflect.Field getField(Class klass, String fieldName) {
+  try {
+    return klass.getDeclaredField(fieldName);
+  }
+  catch (NoSuchFieldException e) {
+    Class superClass = klass.getSuperclass();
+    if (superClass == null) return null;
+    else return getField(superClass, fieldName);
+  }
 }
 
 void mousePressed() {
