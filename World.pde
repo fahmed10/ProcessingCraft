@@ -24,7 +24,7 @@ class World {
     chunks.put(positionCopy, chunk);
     return chunk;
   }
-  
+
   Chunk getChunk(int x, int y) {
     IVector2 temp = IVector2.use().set(x, y);
     Chunk chunk = getChunk(temp, false);
@@ -53,7 +53,7 @@ class World {
 
     return chunk;
   }
-  
+
   Block getWorldBlock(PVector position) {
     Pair<IVector2, IVector3> pair = CoordSpace.getWorldBlockPosition(position);
     if (!chunks.containsKey(pair.first)) {
@@ -61,60 +61,60 @@ class World {
       pair.second.free();
       return null;
     }
-    
+
     Chunk chunk = chunks.get(pair.first);
     Block block = chunk.blocks.get(pair.second);
     pair.first.free();
     pair.second.free();
     return block;
   }
-  
+
   Pair<Chunk, IVector3> globalToLocalBlockPosition(IVector3 position) {
     IVector2 chunkPos = IVector2.use().set(floor((float)position.x / Chunk.CHUNK_BLOCKS), floor((float)position.z / Chunk.CHUNK_BLOCKS));
     if (!chunks.containsKey(chunkPos)) {
       chunkPos.free();
       return null;
     }
-    
+
     Chunk chunk = chunks.get(chunkPos);
     IVector3 blockPos = IVector3.use().set(Math.floorMod(position.x, Chunk.CHUNK_BLOCKS), position.y, Math.floorMod(position.z, Chunk.CHUNK_BLOCKS));
     chunkPos.free();
     return new Pair(chunk, blockPos);
   }
-  
-  RaycastHit raycast(PVector position, PVector direction, float maxDistance) {
-    final float step = Block.BLOCK_SIZE / 15f;
+
+  boolean raycast(PVector position, PVector direction, float maxDistance, RaycastHit out) {
+    final float step = Block.BLOCK_SIZE / 40f;
     float distance = 0f;
     PVector currentPosition = Utils.useVector().set(position);
-    
+
     while (distance <= maxDistance) {
       Block block = getWorldBlock(currentPosition);
-      
+
       if (block != null) {
         PVector previousPosition = currentPosition.copy().sub(direction.copy().mult(step));
-        IVector3 blockNormal = CoordSpace.getWorldBlockGlobalPosition(previousPosition).sub(CoordSpace.getWorldBlockGlobalPosition(currentPosition));
-        PVector hitNormal = previousPosition.sub(currentPosition).normalize();
+        out.hitBlock = block;
+        IVector3 normal = CoordSpace.getWorldBlockGlobalPosition(previousPosition).sub(CoordSpace.getWorldBlockGlobalPosition(currentPosition));
+        if (normal.x > 0 && block.getBlockAtOffset(1, 0, 0) != null) normal.x = 0;
+        if (normal.y > 0 && block.getBlockAtOffset(0, 1, 0) != null) normal.y = 0;
+        if (normal.z > 0 && block.getBlockAtOffset(0, 0, 1) != null) normal.z = 0;
+        if (normal.x < 0 && block.getBlockAtOffset(-1, 0, 0) != null) normal.x = 0;
+        if (normal.y < 0 && block.getBlockAtOffset(0, -1, 0) != null) normal.y = 0;
+        if (normal.z < 0 && block.getBlockAtOffset(0, 0, -1) != null) normal.z = 0;
+        out.blockNormal = normal;
         Utils.free(currentPosition);
-        return new RaycastHit(block, hitNormal, blockNormal);
+        return true;
       }
-      
+
       distance += step;
       currentPosition = currentPosition.add(direction.copy().mult(step));
     }
-    
+
     Utils.free(currentPosition);
-    return null;
+    return false;
   }
 }
 
 class RaycastHit {
   Block hitBlock;
-  PVector normal;
   IVector3 blockNormal;
-  
-  RaycastHit(Block hitBlock, PVector normal, IVector3 blockNormal) {
-    this.hitBlock = hitBlock;
-    this.normal = normal;
-    this.blockNormal = blockNormal;
-  }
 }

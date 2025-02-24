@@ -1,5 +1,5 @@
 class Camera3D extends Object3D {
-  private final PVector WORLD_UP = new PVector(0, 1, 0);
+  final PVector WORLD_UP = new PVector(0, 1, 0);
   float clipNear = 1;
   float clipFar = 2000;
   PVector forward = new PVector();

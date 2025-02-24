@@ -17,6 +17,20 @@ static class Block {
   IVector3 getGlobalPosition() {
     return CoordSpace.getBlockGlobalPosition(chunk.position, position);
   }
+  
+  Block getBlockAtOffset(IVector3 offset) {
+    IVector3 globalPosition = getGlobalPosition();
+    Pair<Chunk, IVector3> pair = chunk.world.globalToLocalBlockPosition(globalPosition.add(offset));
+    globalPosition.free();
+    return pair.first.blocks.get(pair.second);
+  }
+  
+  Block getBlockAtOffset(int x, int y, int z) {
+    IVector3 temp = IVector3.use().set(x, y, z);
+    Block block = getBlockAtOffset(temp);
+    temp.free();
+    return block;
+  }
 }
 
 enum BlockType {

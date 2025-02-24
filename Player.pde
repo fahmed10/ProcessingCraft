@@ -18,7 +18,7 @@ class Player extends Object3D {
   }
 
   void update(float delta) {
-    float speed = 200 * delta;
+    float speed = 60 * delta;
 
     if (Input.isKeyDown(Key.SHIFT)) speed *= 2;
 
@@ -27,9 +27,8 @@ class Player extends Object3D {
     if (Input.isKeyDown('a')) movement.sub(camera.right);
     if (Input.isKeyDown('w')) movement.add(camera.forward);
     if (Input.isKeyDown('s')) movement.sub(camera.forward);
-    movement.mult(speed);
+    movement.normalize().mult(speed);
     position.add(movement);
-    Utils.free(movement);
 
     if (cursor != null) {
       if (Input.isMouseButtonPressed(Mouse.LEFT)) {
@@ -54,14 +53,33 @@ class Player extends Object3D {
     camera.rotation.add(mouse.y * mouseDelta, mouse.x * mouseDelta);
     camera.rotation.x = constrain(camera.rotation.x, minPitch, maxPitch);
 
-    RaycastHit raycastHit = world.raycast(position, camera.forward, Block.BLOCK_SIZE * 5);
-    if (raycastHit == null) {
+    resetShader();
+    RaycastHit raycastHit = new RaycastHit();
+
+    int i = 0;
+    movement = movement.normalize();
+    while ((world.raycast(position.copy().add(1, 1, 1), movement, 9.5, raycastHit) || world.raycast(position.copy().sub(1, 1, 1), movement, 10.5, raycastHit)) && i < 20) {
+      if (raycastHit.blockNormal.absSum() == 0) {
+        movement.set(movement.copy().mult(-speed));
+      } else {
+        movement.set(Utils.reflectVector(movement.copy().mult(speed), raycastHit.blockNormal.toPVector()));
+      }
+      position.add(movement);
+      println(raycastHit.blockNormal, i);
+      movement = movement.normalize();
+      i++;
+    }
+
+    Utils.free(movement);
+    camera.position.set(position);
+    camera.use();
+
+    if (!world.raycast(position, camera.forward, Block.BLOCK_SIZE * 5, raycastHit)) {
       cursor = null;
     } else {
       cursor = raycastHit.hitBlock.getGlobalPosition();
       cursorOffset = raycastHit.blockNormal;
       PVector blockPosition = raycastHit.hitBlock.getWorldPosition();
-      resetShader();
       pushMatrix();
       translate(blockPosition.x, blockPosition.y - Block.BLOCK_SIZE / 2f + 0.02, blockPosition.z);
       noFill();
@@ -70,11 +88,15 @@ class Player extends Object3D {
       strokeWeight(0.1);
       box(Block.BLOCK_SIZE + 0.025);
       fill(255);
-      shader(_game.shader);
       popMatrix();
     }
 
-    camera.position.set(position);
-    camera.use();
+    fill(0);
+    pushMatrix();
+    translate(position.x, position.y, position.z);
+    translate(camera.forward.x, camera.forward.y, camera.forward.z);
+    noStroke();
+    sphere(0.003);
+    popMatrix();
   }
 }

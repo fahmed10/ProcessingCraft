@@ -31,16 +31,17 @@ void draw() {
 
 void keyPressed(KeyEvent e) {
   Input.keyPressed(key, keyCode);
+  if (key == CONTROL) postProcessKeyEvent(e);
   key = 0;
   keyCode = 0;
-  postProcessKeyEvent(e);
 }
 
 void keyReleased(KeyEvent e) {
   Input.keyReleased(key, keyCode);
+
+  if (key == CONTROL) postProcessKeyEvent(e);
   key = 0;
   keyCode = 0;
-  postProcessKeyEvent(e);
 }
 
 void postProcessKeyEvent(KeyEvent e) {

@@ -24,6 +24,14 @@ static class Utils {
     }
   }
 
+  static PVector reflectVector(PVector vector, PVector normal) {
+    return vector.copy().sub(multVector(multVector(vector, normal), normal).mult(2));
+  }
+
+  static PVector multVector(PVector a, PVector b) {
+    return a.set(a.x * b.x, a.y * b.y, a.z * b.z);
+  }
+
   static boolean distGreater(PVector a, PVector b, float dist) {
     return sq(b.x - a.x) + sq(b.y - a.y) > sq(dist);
   }

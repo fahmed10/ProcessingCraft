@@ -39,6 +39,7 @@ class Game {
 
   void update(float delta) {
     frameStartTime = System.nanoTime();
+    shader(shader);
     shader.set("viewportSize", (float)width, (float)height);
     background(Utils.toColor(skyColor));
     noStroke();

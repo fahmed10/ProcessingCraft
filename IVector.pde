@@ -132,6 +132,14 @@ static class IVector3 {
     z -= b.z;
     return this;
   }
+  
+  int absSum() {
+    return abs(x) + abs(y) + abs(z);
+  }
+  
+  PVector toPVector() {
+    return Utils.useVector().set(x, y, z);
+  }
 
   @Override
     boolean equals(Object o) {
@@ -151,5 +159,17 @@ static class IVector3 {
   @Override
     String toString() {
     return "(" + x + ", " + y + ", " + z + ")";
+  }
+}
+
+static class LVector3 {
+  long x, y, z;
+
+  LVector3() {}
+
+  LVector3(long x, long y, long z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 }
