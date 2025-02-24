@@ -113,7 +113,12 @@ static class Key {
     ESC = 27,
     BACKSPACE = 8,
     INSERT = 26,
-    DELETE = 147;
+    DELETE = 147,
+    SPACE = 32,
+    UP = 38,
+    LEFT = 37,
+    RIGHT = 39,
+    DOWN = 40;
 }
 
 static class Mouse {
