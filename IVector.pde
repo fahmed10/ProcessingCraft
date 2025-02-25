@@ -126,6 +126,13 @@ static class IVector3 {
     return this;
   }
   
+  IVector3 add(int x, int y, int z) {
+    this.x += x;
+    this.y += y;
+    this.z += z;
+    return this;
+  }
+  
   IVector3 sub(IVector3 b) {
     x -= b.x;
     y -= b.y;
