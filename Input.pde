@@ -83,12 +83,14 @@ static class Input {
 
   private static void keyPressed(int key, int keyCode) {
     int id = key == CODED ? keyCode : Character.toLowerCase(key);
+    if (key == CODED && keyCode >= 65 && keyCode <= 90) id += 32;
     keysDown[id] = true;
     keyState[id] = 1;
   }
 
   private static void keyReleased(int key, int keyCode) {
     int id = key == CODED ? keyCode : Character.toLowerCase(key);
+    if (key == CODED && keyCode >= 65 && keyCode <= 90) id += 32;
     keysDown[id] = false;
     keyState[id] = 2;
   }

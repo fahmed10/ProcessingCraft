@@ -31,15 +31,14 @@ void draw() {
 
 void keyPressed(KeyEvent e) {
   Input.keyPressed(key, keyCode);
-  if (key == CONTROL) postProcessKeyEvent(e);
+  if (key == CODED && keyCode == 87) postProcessKeyEvent(e);
   key = 0;
   keyCode = 0;
 }
 
 void keyReleased(KeyEvent e) {
   Input.keyReleased(key, keyCode);
-
-  if (key == CONTROL) postProcessKeyEvent(e);
+  if (key == CODED && keyCode == 87) postProcessKeyEvent(e);
   key = 0;
   keyCode = 0;
 }
