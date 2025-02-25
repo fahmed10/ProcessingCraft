@@ -41,12 +41,14 @@ class World {
 
     for (int x = 0; x < Chunk.CHUNK_BLOCKS; x++) {
       for (int z = 0; z < Chunk.CHUNK_BLOCKS; z++) {
-        float noiseValue = perlinNoise2d(position.x * Chunk.CHUNK_BLOCKS + x, position.y * Chunk.CHUNK_BLOCKS + z, 0.075);
+        float globalX = position.x * Chunk.CHUNK_BLOCKS + x;
+        float globalY = position.y * Chunk.CHUNK_BLOCKS + z;
+        float noiseValue = perlinNoise2d(globalX, globalY, 0.075) + perlinNoise2d(globalX - 46375, globalY + 19846, 0.03) + max(0, perlinNoise2d(globalX + 7653, globalY - 35627, 0.05) - 0.5f) * 3;
         int y = round(noiseValue * 6);
 
-        chunk.setBlock(x, y, z, y <= 2 ? BlockType.SAND : BlockType.GRASS);
-        for (int i = 1; y - i >= -5; i++) {
-          chunk.setBlock(x, y - i, z, BlockType.DIRT);
+        chunk.setBlock(x, y, z, y <= 3 ? BlockType.SAND : BlockType.GRASS);
+        for (int i = 1; y - i >= -6; i++) {
+          chunk.setBlock(x, y - i, z, i >= 3 ? BlockType.STONE : BlockType.DIRT);
         }
       }
     }

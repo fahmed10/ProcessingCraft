@@ -37,6 +37,7 @@ enum BlockType {
   GRASS(1, 2, 0, 0, 0, 0),
   DIRT(2, 2, 2, 2, 2, 2),
   SAND(4, 4, 4, 4, 4, 4),
+  STONE(5, 5, 5, 5, 5, 5),
   DEBUG(3, 3, 3, 3, 3, 3);
 
   private static BlockType[] values = BlockType.values();
