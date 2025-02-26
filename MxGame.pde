@@ -1,8 +1,10 @@
 import com.jogamp.newt.opengl.*;
 import com.jogamp.opengl.*;
+import java.lang.reflect.*;
 
 Game _game = new Game();
 long _lastTime = 0;
+Field _modifiersField;
 MxGame outer;
 GL4 gl;
 PGraphicsOpenGL pgl;
@@ -16,6 +18,8 @@ void setup() {
   Input.init(surface, width, height);
   gl = (GL4)((GLWindow)surface.getNative()).getGL();
   pgl = (PGraphicsOpenGL)g;
+  _modifiersField = getField(KeyEvent.class, "modifiers");
+  _modifiersField.setAccessible(true);
   _game.start();
   _lastTime = System.nanoTime();
   _game.update(0);
@@ -44,16 +48,14 @@ void keyReleased(KeyEvent e) {
 }
 
 void postProcessKeyEvent(KeyEvent e) {
-  var field = getField(e.getClass(), "modifiers");
-  field.setAccessible(true);
   try {
-    field.set(e, 0);
+    _modifiersField.set(e, 0);
   }
   catch (Exception ex) {
   }
 }
 
-java.lang.reflect.Field getField(Class klass, String fieldName) {
+Field getField(Class klass, String fieldName) {
   try {
     return klass.getDeclaredField(fieldName);
   }
