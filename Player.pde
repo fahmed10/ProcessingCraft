@@ -17,17 +17,21 @@ class Player extends Object3D {
 
   void start() {
     position.set(0, Block.BLOCK_SIZE * 20, 0);
+    while (world.getWorldBlock(position) == null && position.y > Block.BLOCK_SIZE * -256) {
+      position.sub(0, Block.BLOCK_SIZE, 0);
+    }
+    position.add(0, Block.BLOCK_SIZE * 3, 0);
   }
 
   void update(float delta) {
     float speed = 100 * delta;
-    yVelocity -= delta * 200;
+    yVelocity -= delta * 225;
     yVelocity = max(yVelocity, 0);
 
     if (Input.isKeyDown(Key.SHIFT)) speed *= 2;
     if (Input.isKeyDown(Key.CTRL)) speed /= 3;
-    if (canJump && Input.isKeyPressed(Key.SPACE)) { 
-      yVelocity = 265;
+    if (canJump && Input.isKeyPressed(Key.SPACE)) {
+      yVelocity = 292;
       canJump = false;
     }
 
@@ -38,11 +42,10 @@ class Player extends Object3D {
     if (Input.isKeyDown('s')) movement.sub(camera.forward);
     movement.y = 0;
     movement.normalize().mult(speed);
-    position.add(movement);
-    
+
     position.add(0, yVelocity * delta, 0);
-    if (world.getWorldBlock(position.copy().sub(-4, Block.BLOCK_SIZE / 2f, -4)) == null && world.getWorldBlock(position.copy().sub(4, Block.BLOCK_SIZE / 2f, 4)) == null) {
-      position.sub(0, min(delta * 170, Block.BLOCK_SIZE), 0);
+    if (world.getWorldBlock(position.copy().sub(-3.5, Block.BLOCK_SIZE / 2f, -3.5)) == null && world.getWorldBlock(position.copy().sub(3.5, Block.BLOCK_SIZE / 2f, 3.5)) == null) {
+      position.sub(0, min(delta * 180, Block.BLOCK_SIZE - 0.01), 0);
     } else {
       canJump = true;
       yVelocity = 0;
@@ -75,16 +78,28 @@ class Player extends Object3D {
     RaycastHit raycastHit = new RaycastHit();
 
     int i = 0;
-    movement = movement.normalize();
-    while ((world.raycast(position.copy().add(1, 1, 1), movement, 9.5, raycastHit) || world.raycast(position.copy().sub(1, 1, 1), movement, 10.5, raycastHit)) && i < 20) {
+    PVector currentPosition = position.copy();
+    PVector currentMovement = movement.copy().normalize();
+    while ((world.raycast(currentPosition.copy().add(1, 1, 1), currentMovement, 5, raycastHit) || world.raycast(currentPosition.copy().sub(1, 1, 1), currentMovement, 5, raycastHit)) && i < 10) {
+      if (i == 0) currentPosition.add(movement);
+
       if (raycastHit.blockNormal.absSum() == 0) {
-        movement.set(movement.copy().mult(-speed));
+        currentMovement.set(currentMovement.copy().mult(-speed));
       } else {
-        movement.set(Utils.reflectVector(movement.copy().mult(speed), raycastHit.blockNormal.toPVector()));
+        currentMovement.set(Utils.reflectVector(currentMovement.copy().mult(speed), raycastHit.blockNormal.toPVector()));
       }
-      position.add(movement);
-      movement = movement.normalize();
+      currentPosition.add(currentMovement);
+      currentMovement = currentMovement.normalize();
       i++;
+    }
+
+    if (i == 0) {
+      currentPosition.add(movement);
+    }
+    if (i < 10) {
+      currentPosition.sub(position);
+      if (currentPosition.magSq() > sq(speed)) currentPosition.normalize().mult(speed);
+      position.add(currentPosition);
     }
 
     if (!world.raycast(camera.position, camera.forward, Block.BLOCK_SIZE * 5, raycastHit)) {
