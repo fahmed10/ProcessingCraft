@@ -97,7 +97,7 @@ class Player extends Object3D {
       translate(blockPosition.x, blockPosition.y - Block.BLOCK_SIZE / 2f + 0.02, blockPosition.z);
       noFill();
       strokeJoin(ROUND);
-      stroke(0, 0, 0, 150);
+      stroke(0, 0, 0, 100);
       strokeWeight(0.1);
       box(Block.BLOCK_SIZE + 0.025);
       popMatrix();
