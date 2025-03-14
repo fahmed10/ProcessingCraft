@@ -34,6 +34,7 @@ class Game {
     music.play(1, 0.5);
 
     player.camera.clipFar = drawRadius;
+    update(0);
     player.start();
   }
 
