@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 Game _game = new Game();
 long _lastTime = 0;
 Field _modifiersField;
-MxGame outer;
+ProcessingCraft outer;
 GL4 gl;
 PGraphicsOpenGL pgl;
 DebugDrawer Debug = new DebugDrawer();
